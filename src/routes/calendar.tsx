@@ -7,14 +7,43 @@ import { BarButton, Page } from "@/components/app-shell"
 import { MonthGrid } from "@/components/month-grid"
 import { DatePickerDrawer } from "@/components/date-picker-drawer"
 import { Group, Row } from "@/components/ios"
-import { db, entryHasContent, MOODS } from "@/lib/db"
-import { isISODate, monthDay, toISO, todayISO } from "@/lib/date"
+import { weatherInfo } from "@/lib/weather"
+import { db, emptyEntry, entryHasContent, MOODS } from "@/lib/db"
+import { formatTime12, fromISO, isISODate, monthDay, toISO, todayISO } from "@/lib/date"
 import { setNav } from "@/lib/nav"
+
+/** Selected-day summary under the grid, like the event list in iOS Calendar. */
+function DaySummary({ date, onOpen }: { date: string; onOpen: () => void }) {
+  const e = useLiveQuery(async () => (await db.entries.get(date)) ?? emptyEntry(date), [date])
+  if (!e) return null
+  const mood = MOODS.find((m) => m.value === e.mood)
+  const bp = e.bp.filter((b) => b.sys && b.dia).at(-1)
+  const lines = [
+    mood && { label: "Mood", value: `${mood.emoji} ${mood.label}` },
+    e.energy && { label: "Energy", value: `${e.energy}%` },
+    e.weather && { label: "Weather", value: `${weatherInfo(e.weather.code).icon} ${e.weather.temp}°` },
+    bp && { label: "Blood Pressure", value: `${bp.sys}/${bp.dia}` },
+    e.steps && { label: "Steps", value: e.steps.toLocaleString() },
+    e.workouts.length > 0 && { label: "Workouts", value: String(e.workouts.length) },
+    e.events.length > 0 && { label: "Next Event", value: `${formatTime12(e.events[0].time)} ${e.events[0].title}` },
+    e.photos.length > 0 && { label: "Photos", value: String(e.photos.length) },
+  ].filter(Boolean) as { label: string; value: string }[]
+  return (
+    <Group header={format(fromISO(date), "EEEE, d MMMM")} footer={!entryHasContent(e) ? "Nothing logged yet." : undefined}>
+      {lines.map((l) => (
+        <Row key={l.label} label={l.label} value={l.value} />
+      ))}
+      {e.journal.text && <p className="line-clamp-3 px-4 py-3 font-serif text-[16px] text-muted-foreground italic">{e.journal.text}</p>}
+      <Row label={<span className="font-semibold text-primary">Open Day</span>} onClick={onOpen} chevron />
+    </Group>
+  )
+}
 
 export function Component() {
   const navigate = useNavigate()
   const [month, setMonth] = useState(() => startOfMonth(new Date()))
   const [picker, setPicker] = useState(false)
+  const [selected, setSelected] = useState(todayISO())
   const from = toISO(startOfMonth(month))
   const to = toISO(endOfMonth(month))
   const isThisMonth = from === toISO(startOfMonth(new Date()))
@@ -52,7 +81,12 @@ export function Component() {
       wide
       actions={
         !isThisMonth && (
-          <BarButton label="This month" onClick={() => setMonth(startOfMonth(new Date()))} className="px-4 text-[15px] font-semibold text-primary">
+          <BarButton
+            label="This month"
+            onClick={() => {
+              setMonth(startOfMonth(new Date()))
+              setSelected(todayISO())
+            }} className="px-4 text-[15px] font-semibold text-primary">
             Today
           </BarButton>
         )
@@ -95,11 +129,22 @@ export function Component() {
               if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) setMonth((m) => addMonths(m, dx < 0 ? 1 : -1))
             }}
           >
-            <MonthGrid month={month} size="lg" marks={marks} onSelect={open} />
+            <MonthGrid
+              month={month}
+              size="lg"
+              marks={marks}
+              selected={selected}
+              onSelect={(d) => {
+                navigator.vibrate?.(6)
+                setSelected(d)
+                if (d.slice(0, 7) !== from.slice(0, 7)) setMonth(startOfMonth(fromISO(d)))
+              }}
+            />
           </div>
         </section>
 
         <div className="grid gap-8">
+          <DaySummary date={selected} onOpen={() => open(selected)} />
           <div className="grid grid-cols-3 gap-3">
             {(
               [
@@ -133,7 +178,15 @@ export function Component() {
           )}
         </div>
       </div>
-      <DatePickerDrawer open={picker} onOpenChange={setPicker} value={from} onPick={open} />
+      <DatePickerDrawer
+        open={picker}
+        onOpenChange={setPicker}
+        value={selected}
+        onPick={(d) => {
+          setSelected(d)
+          setMonth(startOfMonth(fromISO(d)))
+        }}
+      />
     </Page>
   )
 }
