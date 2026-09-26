@@ -60,10 +60,10 @@ export function AppShell() {
         <Outlet />
       </div>
 
-      <div aria-hidden className="edge-bottom pointer-events-none absolute inset-x-0 bottom-0 z-20 h-32 md:hidden" />
+      <div aria-hidden className="kb-hide edge-bottom pointer-events-none absolute inset-x-0 bottom-0 z-20 h-32 md:hidden" />
       <nav
         aria-label="Primary"
-        className="tabbar no-print pointer-events-none absolute inset-x-0 bottom-0 z-30 flex items-center gap-3 px-[21px] pb-[max(calc(env(safe-area-inset-bottom)-6px),16px)] md:hidden"
+        className="kb-hide tabbar no-print pointer-events-none absolute inset-x-0 bottom-0 z-30 flex items-center gap-3 px-[21px] pb-[max(calc(env(safe-area-inset-bottom)-6px),16px)] md:hidden"
       >
         <div className="glass pointer-events-auto flex min-w-0 flex-1 items-center rounded-full p-1">
           {TABS.map((t) => (
@@ -88,7 +88,7 @@ export function AppShell() {
 }
 
 /** Space reserved below content so it can scroll clear of the floating tab bar. */
-export const TAB_BAR_SPACE = "pb-[calc(env(safe-area-inset-bottom)+7rem)] md:pb-16"
+export const TAB_BAR_SPACE = "pb-[calc(env(safe-area-inset-bottom)+7rem+var(--kb,0px))] md:pb-[calc(4rem+var(--kb,0px))]"
 
 /** Round Liquid Glass bar button (icon) — the navigation-layer control style. */
 export function BarButton({

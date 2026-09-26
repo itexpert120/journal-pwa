@@ -352,3 +352,8 @@ html[data-nav="modal"]::view-transition-old(screen) {
   25% { transform: translateX(-8px); }
   75% { transform: translateX(8px); }
 }
+
+/* Software keyboard up (see lib/keyboard.ts): the floating tab bar would sit on top of it. */
+html[data-keyboard] .kb-hide {
+  display: none;
+}

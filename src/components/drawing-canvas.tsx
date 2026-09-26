@@ -150,6 +150,8 @@ export function DrawingCanvas({
       className={className}
       style={{ touchAction: active ? "none" : "auto", pointerEvents: active ? "auto" : "none" }}
       aria-label={active ? "Handwriting area" : undefined}
+      // Inside a bottom sheet, strokes must not be read as a swipe-to-dismiss drag.
+      data-base-ui-swipe-ignore={active ? "" : undefined}
       aria-hidden={!active}
     />
   )

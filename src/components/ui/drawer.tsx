@@ -29,7 +29,8 @@ function Drawer({
   snapPoints,
   swipeDirection = "down",
   ...props
-}: DrawerPrimitive.Root.Props & {
+}: Omit<DrawerPrimitive.Root.Props, "children"> & {
+  children?: React.ReactNode
   showSwipeHandle?: boolean
 }) {
   const hasSnapPoints = snapPoints != null && snapPoints.length > 0
@@ -46,7 +47,10 @@ function Drawer({
         snapPoints={snapPoints}
         swipeDirection={swipeDirection}
         {...props}
-      />
+      >
+        {/* Keeps a focused field scrolled clear of the software keyboard. */}
+        <DrawerPrimitive.VirtualKeyboardProvider>{props.children}</DrawerPrimitive.VirtualKeyboardProvider>
+      </DrawerPrimitive.Root>
     </DrawerContext.Provider>
   )
 }

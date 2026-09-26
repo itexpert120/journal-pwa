@@ -9,10 +9,12 @@ import { RouteError } from "./components/route-error"
 import { isISODate, todayISO } from "./lib/date"
 import { initTheme } from "./lib/theme"
 import { initLock } from "./lib/lock"
+import { initKeyboard } from "./lib/keyboard"
 // Side effect: capture beforeinstallprompt early, before the More screen loads.
 import "./lib/install"
 
 initTheme()
+initKeyboard()
 
 function DayRedirect() {
   const { date } = useParams()
