@@ -44,7 +44,7 @@ export function DatePickerDrawer({
         <DrawerHeader>
           <DrawerTitle className="text-3xl">Go to date</DrawerTitle>
         </DrawerHeader>
-        <div className="grid gap-4 overflow-y-auto p-4 pb-safe">
+        <div className="grid gap-4 overflow-y-auto p-4">
           <div className="flex items-center gap-2">
             <Button variant="outline" size="icon" aria-label="Previous month" onClick={() => go(addMonths(month, -1))}>
               <ChevronLeft />

@@ -42,14 +42,14 @@ function Seg<T extends string>({
     <ToggleGroup
       value={[value]}
       onValueChange={(v) => v[0] && onChange(v[0] as T)}
-      variant="outline"
+      variant="segmented"
       spacing={0}
       className="grid w-full"
       style={{ gridTemplateColumns: `repeat(${options.length}, 1fr)` }}
       aria-label={label}
     >
       {options.map(([v, l]) => (
-        <ToggleGroupItem key={v} value={v} className="aria-pressed:bg-primary aria-pressed:text-primary-foreground">
+        <ToggleGroupItem key={v} value={v}>
           {l}
         </ToggleGroupItem>
       ))}

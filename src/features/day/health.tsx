@@ -3,7 +3,7 @@ import { Activity, HeartPulse, Pill, Scale, Stethoscope } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select } from "@/components/ui/select"
 import { Field, NumberField, TextAreaField, TextField } from "@/components/fields"
 import { AddButton, Empty, Item, RemoveButton, Section } from "@/components/section"
 import { Attachments } from "@/components/attachments"
@@ -86,18 +86,13 @@ function Ecg({ date, entry, patch }: SectionProps) {
         <Item key={r.id}>
           <div className="flex items-center gap-2">
             <TimeInput value={r.time} onChange={(v) => upd(r.id, (x) => void (x.time = v))} />
-            <Select value={r.status} onValueChange={(v) => upd(r.id, (x) => void (x.status = String(v)))}>
-              <SelectTrigger className={cn("flex-1", r.status !== "Normal" && "text-alert")} aria-label="ECG status">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {ECG_STATUSES.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Select
+              label="ECG status"
+              value={r.status}
+              options={ECG_STATUSES}
+              onValueChange={(v) => upd(r.id, (x) => void (x.status = v))}
+              className={cn("flex-1", r.status !== "Normal" && "text-alert")}
+            />
             <RemoveButton onClick={() => patch((e) => void (e.ecg = e.ecg.filter((x) => x.id !== r.id)))} />
           </div>
           <TextField value={r.note} onCommit={(v) => upd(r.id, (x) => void (x.note = v))} placeholder="Note (optional)" />
@@ -239,18 +234,13 @@ function Checkups({ date, entry, patch }: SectionProps) {
       {entry.checkups.map((c) => (
         <Item key={c.id}>
           <div className="flex items-center gap-2">
-            <Select value={c.kind} onValueChange={(v) => upd(c.id, (x) => void (x.kind = String(v)))}>
-              <SelectTrigger className="flex-1" aria-label="Type">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CHECKUP_KINDS.map((k) => (
-                  <SelectItem key={k} value={k}>
-                    {k}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Select
+              label="Checkup type"
+              value={c.kind}
+              options={CHECKUP_KINDS}
+              onValueChange={(v) => upd(c.id, (x) => void (x.kind = v))}
+              className="flex-1"
+            />
             <TimeInput value={c.time} onChange={(v) => upd(c.id, (x) => void (x.time = v))} />
             <RemoveButton onClick={() => patch((e) => void (e.checkups = e.checkups.filter((x) => x.id !== c.id)))} />
           </div>

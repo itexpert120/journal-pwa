@@ -153,8 +153,16 @@
     -webkit-appearance: none;
     margin: 0;
   }
-  h1, h2, h3 {
-    @apply font-heading;
+  /* Display serif only for large titles; small headings stay in the UI sans. */
+  h1, h2 {
+    @apply font-heading font-normal;
+  }
+  /* Native apps don't show desktop scrollbars; touch scrolling shows its own indicator. */
+  main {
+    scrollbar-width: none;
+  }
+  main::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -163,6 +171,12 @@
 }
 @utility pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
+}
+@utility pl-safe {
+  padding-left: env(safe-area-inset-left);
+}
+@utility pr-safe {
+  padding-right: env(safe-area-inset-right);
 }
 @utility scrollbar-none {
   scrollbar-width: none;

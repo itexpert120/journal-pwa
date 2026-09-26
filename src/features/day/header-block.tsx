@@ -94,7 +94,7 @@ function WeatherChip({ date, entry, patch }: SectionProps) {
           <DrawerHeader>
             <DrawerTitle className="text-3xl">Weather</DrawerTitle>
           </DrawerHeader>
-          <div className="grid gap-4 p-4 pb-safe">
+          <div className="grid gap-4 p-4">
             {isToday && (
               <Button variant="secondary" size="lg" onClick={() => auto()} disabled={loading}>
                 {loading ? <Loader2 className="animate-spin" /> : <LocateFixed />} Use my location

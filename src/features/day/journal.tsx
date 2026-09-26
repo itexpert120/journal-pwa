@@ -61,7 +61,7 @@ export function JournalSection({ date, entry, patch }: SectionProps) {
           <ToggleGroup
             value={[paper]}
             onValueChange={(v) => v[0] && patch((e) => void (e.journal.paper = v[0] as Paper))}
-            variant="outline"
+            variant="segmented"
             size="sm"
             spacing={0}
             aria-label="Paper style"
@@ -82,18 +82,18 @@ export function JournalSection({ date, entry, patch }: SectionProps) {
         <ToggleGroup
           value={[mode]}
           onValueChange={(v) => v[0] && setMode(v[0] as Mode)}
-          variant="outline"
+          variant="segmented"
           spacing={0}
           className="grid w-full grid-cols-3"
           aria-label="Input mode"
         >
-          <ToggleGroupItem value="type" className="aria-pressed:bg-primary aria-pressed:text-primary-foreground">
+          <ToggleGroupItem value="type">
             <Keyboard /> Type
           </ToggleGroupItem>
-          <ToggleGroupItem value="write" className="aria-pressed:bg-primary aria-pressed:text-primary-foreground">
+          <ToggleGroupItem value="write">
             <PenLine /> Write
           </ToggleGroupItem>
-          <ToggleGroupItem value="voice" className="aria-pressed:bg-primary aria-pressed:text-primary-foreground">
+          <ToggleGroupItem value="voice">
             <Mic /> Voice
           </ToggleGroupItem>
         </ToggleGroup>

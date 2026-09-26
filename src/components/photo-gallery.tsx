@@ -120,7 +120,7 @@ export function PhotoGallery({
             <DrawerTitle className="text-3xl">Memory</DrawerTitle>
           </DrawerHeader>
           {open && (
-            <div className="grid gap-4 overflow-y-auto p-4 pb-safe">
+            <div className="grid gap-4 overflow-y-auto p-4">
               {openUrl && <img src={openUrl} alt={open.caption || "Photo"} className="max-h-[45dvh] w-full rounded-xl object-contain" />}
               <Field label="Caption">
                 <TextField value={open.caption} onCommit={(v) => upd(open.id, (p) => ({ ...p, caption: v }))} placeholder="A short caption" />

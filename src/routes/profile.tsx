@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select } from "@/components/ui/select"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Page } from "@/components/app-shell"
 import { Field, NumberField, TextAreaField, TextField } from "@/components/fields"
@@ -41,11 +41,14 @@ function PhotoPicker({ profile, upd }: { profile: Profile; upd: Upd }) {
     <button
       type="button"
       onClick={() => input.current?.click()}
-      className="relative grid size-24 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-primary/30 bg-muted"
+      className="relative size-24 shrink-0 transition-transform active:scale-95 md:size-28"
       aria-label="Change profile photo"
     >
-      {url ? <img src={url} alt="Profile" className="size-full object-cover" /> : <UserRound className="size-10 text-muted-foreground" />}
-      <span className="absolute right-0 bottom-0 grid size-8 place-items-center rounded-full bg-primary text-primary-foreground">
+      {/* Clip only the photo; the camera badge overlaps the ring. */}
+      <span className="grid size-full place-items-center overflow-hidden rounded-full bg-muted ring-2 ring-primary/30">
+        {url ? <img src={url} alt="Profile" className="size-full object-cover" /> : <UserRound className="size-10 text-muted-foreground" />}
+      </span>
+      <span className="absolute -right-0.5 -bottom-0.5 grid size-9 place-items-center rounded-full border-3 border-card bg-primary text-primary-foreground shadow-sm">
         <Camera className="size-4" />
       </span>
       <input
@@ -101,7 +104,7 @@ function Signature({ profile, upd }: { profile: Profile; upd: Upd }) {
           <DrawerHeader>
             <DrawerTitle className="text-3xl">Signature</DrawerTitle>
           </DrawerHeader>
-          <div className="grid gap-3 p-4 pb-safe">
+          <div className="grid gap-3 p-4">
             <div className="h-48 rounded-xl border bg-paper">
               <DrawingCanvas
                 strokes={strokes.map((s) => ({ ...s, color: ink }))}
@@ -253,18 +256,14 @@ export function Component() {
         <Section title="Medical" icon={HeartPulse}>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Blood group" group>
-              <Select value={profile.bloodGroup ?? null} onValueChange={(v) => upd((p) => void (p.bloodGroup = v ?? undefined))}>
-                <SelectTrigger className="w-full" aria-label="Blood group">
-                  <SelectValue placeholder="—" />
-                </SelectTrigger>
-                <SelectContent>
-                  {BLOOD_GROUPS.map((b) => (
-                    <SelectItem key={b} value={b}>
-                      {b}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Select
+                label="Blood group"
+                value={profile.bloodGroup}
+                options={BLOOD_GROUPS}
+                placeholder="—"
+                onValueChange={(v) => upd((p) => void (p.bloodGroup = v))}
+                className="w-full"
+              />
             </Field>
             <Field label="Date of birth" hint={age !== undefined ? `${age} yrs` : undefined}>
               <Input type="date" value={profile.dob ?? ""} onChange={(e) => upd((p) => void (p.dob = e.target.value || undefined))} />

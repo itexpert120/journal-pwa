@@ -1,7 +1,7 @@
 import { useRef } from "react"
 import { Camera, Droplets, Footprints, Minus, Plus, Utensils, Dumbbell, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select } from "@/components/ui/select"
 import { Field, NumberField, TextAreaField, TextField } from "@/components/fields"
 import { AddButton, Empty, Item, RemoveButton, Section } from "@/components/section"
 import { db, MEAL_SLOTS, saveFile, WORKOUT_TYPES, type Meal, type MealSlot } from "@/lib/db"
@@ -50,18 +50,13 @@ function Workouts({ entry, patch }: SectionProps) {
       {entry.workouts.map((w) => (
         <Item key={w.id}>
           <div className="flex items-center gap-2">
-            <Select value={w.type} onValueChange={(v) => upd(w.id, (x) => void (x.type = String(v)))}>
-              <SelectTrigger className="flex-1" aria-label="Workout type">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {WORKOUT_TYPES.map((t) => (
-                  <SelectItem key={t} value={t}>
-                    {t}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Select
+              label="Workout type"
+              value={w.type}
+              options={WORKOUT_TYPES}
+              onValueChange={(v) => upd(w.id, (x) => void (x.type = v))}
+              className="flex-1"
+            />
             <RemoveButton onClick={() => patch((e) => void (e.workouts = e.workouts.filter((x) => x.id !== w.id)))} />
           </div>
           {w.type === "Custom" && (

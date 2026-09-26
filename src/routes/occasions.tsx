@@ -87,7 +87,7 @@ export function Component() {
             <DrawerTitle className="text-3xl">New occasion</DrawerTitle>
           </DrawerHeader>
           <form
-            className="grid gap-4 p-4 pb-safe"
+            className="grid gap-4 p-4"
             onSubmit={(e) => {
               e.preventDefault()
               save()
