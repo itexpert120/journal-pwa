@@ -1,12 +1,23 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router"
-import { Delete, Fingerprint, HeartPulse, Lock } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Asterisk, Delete, Lock, ScanFace } from "lucide-react"
 import { getLockConfig, lockStore, unlockWithBiometric, verifyPin, type LockConfig } from "@/lib/lock"
+import { setNav } from "@/lib/nav"
 import { cn } from "@/lib/utils"
 
-const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "bio", "0", "del"] as const
+const KEYS = [
+  ["1", ""],
+  ["2", "ABC"],
+  ["3", "DEF"],
+  ["4", "GHI"],
+  ["5", "JKL"],
+  ["6", "MNO"],
+  ["7", "PQRS"],
+  ["8", "TUV"],
+  ["9", "WXYZ"],
+] as const
 
+/** iOS passcode screen: dots, glass number keys, Face ID, Emergency. */
 export function LockScreen() {
   const [cfg, setCfg] = useState<LockConfig>()
   const [pin, setPin] = useState("")
@@ -17,22 +28,19 @@ export function LockScreen() {
     try {
       if (await unlockWithBiometric(c.credentialId)) lockStore.set(false)
     } catch {
-      /* user cancelled — fall back to PIN */
+      /* cancelled — fall back to passcode */
     }
   }
 
   useEffect(() => {
     getLockConfig().then((c) => {
       setCfg(c)
-      // Auto-prompt biometrics on open, like native apps.
       if (c.credentialId) bio(c)
     })
   }, [])
 
-  const press = async (k: (typeof KEYS)[number]) => {
+  const press = async (k: string) => {
     navigator.vibrate?.(8)
-    if (k === "bio") return bio()
-    if (k === "del") return setPin((p) => p.slice(0, -1))
     const next = (pin + k).slice(0, 6)
     setPin(next)
     setError(false)
@@ -40,60 +48,65 @@ export function LockScreen() {
     else if (next.length === 6) {
       setError(true)
       navigator.vibrate?.([30, 40, 30])
-      setTimeout(() => setPin(""), 350)
+      setTimeout(() => setPin(""), 400)
     }
   }
 
+  const key = "grid size-[78px] place-items-center rounded-full bg-foreground/[0.08] transition-[background-color,transform] duration-100 active:scale-95 active:bg-foreground/25 dark:bg-white/[0.14]"
+
   return (
-    <div className="fixed inset-0 z-100 flex flex-col items-center bg-leather px-8 pt-safe pb-safe text-leather-foreground">
-      <div className="flex flex-1 flex-col items-center justify-center gap-5">
-        <Lock className="size-8 opacity-70" />
-        <h1 className="text-4xl">Journal is locked</h1>
-        <div className={cn("flex h-4 gap-3", error && "animate-[shake_0.3s]")} aria-live="polite">
+    <div className="fixed inset-0 z-100 flex flex-col items-center bg-background px-8 pt-safe pb-safe">
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 pt-10">
+        <Lock className="size-6" />
+        <p className="text-[20px] font-medium">{error ? "Wrong Passcode" : "Enter Passcode"}</p>
+        <div className={cn("flex h-4 gap-5", error && "animate-[shake_0.35s]")} aria-live="polite" aria-label={`${pin.length} digits entered`}>
           {Array.from({ length: Math.max(4, pin.length) }).map((_, i) => (
-            <span
-              key={i}
-              className={cn("size-3 rounded-full border border-current", i < pin.length && "bg-current")}
-            />
+            <span key={i} className={cn("size-3.5 rounded-full border-[1.5px] border-foreground transition-colors", i < pin.length && "bg-foreground")} />
           ))}
         </div>
-        <p className="h-5 text-sm opacity-80">{error ? "Wrong PIN" : "Enter your PIN"}</p>
       </div>
-      <div className="grid w-full max-w-72 grid-cols-3 gap-4 pb-6">
-        {KEYS.map((k) =>
-          k === "bio" ? (
-            <Button
-              key={k}
-              variant="ghost"
-              aria-label="Unlock with biometrics"
-              className="size-18 justify-self-center rounded-full text-leather-foreground hover:bg-white/10"
-              disabled={!cfg?.credentialId}
-              onClick={() => press(k)}
-            >
-              {cfg?.credentialId && <Fingerprint className="size-7" />}
-            </Button>
-          ) : (
-            <Button
-              key={k}
-              variant="ghost"
-              aria-label={k === "del" ? "Delete" : k}
-              className={cn(
-                "size-18 justify-self-center rounded-full text-3xl font-light text-leather-foreground hover:bg-white/10",
-                k !== "del" && "bg-white/8",
-              )}
-              onClick={() => press(k)}
-            >
-              {k === "del" ? <Delete className="size-6" /> : k}
-            </Button>
-          ),
-        )}
+
+      <div className="grid grid-cols-3 gap-x-6 gap-y-4 pb-4">
+        {KEYS.map(([n, letters]) => (
+          <button key={n} type="button" aria-label={n} onClick={() => press(n)} className={key}>
+            <span className="grid justify-items-center leading-none">
+              <span className="text-[34px] font-light">{n}</span>
+              <span className="h-3 text-[10px] font-semibold tracking-[0.15em]">{letters}</span>
+            </span>
+          </button>
+        ))}
+        <button
+          type="button"
+          aria-label="Unlock with Face ID"
+          disabled={!cfg?.credentialId}
+          onClick={() => bio()}
+          className="grid size-[78px] place-items-center rounded-full text-primary active:scale-95 disabled:invisible"
+        >
+          <ScanFace className="size-8" strokeWidth={1.6} />
+        </button>
+        <button type="button" aria-label="0" onClick={() => press("0")} className={key}>
+          <span className="text-[34px] font-light">0</span>
+        </button>
+        <button
+          type="button"
+          aria-label="Delete"
+          onClick={() => setPin((p) => p.slice(0, -1))}
+          className={cn("grid size-[78px] place-items-center rounded-full active:scale-95", !pin && "invisible")}
+        >
+          <Delete className="size-7" strokeWidth={1.6} />
+        </button>
       </div>
-      <Link
-        to="/emergency"
-        className="mb-4 flex items-center gap-2 rounded-full bg-alert px-5 py-3 text-sm font-semibold text-white"
-      >
-        <HeartPulse className="size-4" /> Emergency medical info
-      </Link>
+
+      <div className="flex w-full max-w-xs justify-center pb-5">
+        <Link
+          to="/emergency"
+          viewTransition
+          onClick={() => setNav("modal")}
+          className="flex h-11 items-center gap-1.5 rounded-full px-4 text-[17px] font-medium text-alert active:bg-muted"
+        >
+          <Asterisk className="size-5" strokeWidth={3} /> Emergency
+        </Link>
+      </div>
     </div>
   )
 }
