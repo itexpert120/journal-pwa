@@ -1,20 +1,24 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+/* Inter (optical sizes) stands in for SF Pro off Apple devices; Source Serif for "New York". */
+@import "@fontsource-variable/inter/opsz.css";
+@import "@fontsource-variable/source-serif-4/opsz.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
     /* System fonts: SF Pro on Apple devices, Roboto on Android — native look, zero download. */
-    --font-heading: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, "Segoe UI", Roboto, sans-serif;
-    --font-serif: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
+    /* Apple devices get SF Pro / New York natively; everyone else gets Inter / Source Serif. */
+    --font-heading: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter Variable", system-ui, sans-serif;
+    --font-serif: "New York", ui-serif, "Source Serif 4 Variable", Georgia, serif;
     --color-paper: var(--paper);
     --color-paper-line: var(--paper-line);
     --color-leather: var(--leather);
     --color-leather-foreground: var(--leather-foreground);
     --color-alert: var(--alert);
     --color-success: var(--success);
-    --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Variable", system-ui, sans-serif;
     --color-chart-5: var(--chart-5);
     --color-chart-4: var(--chart-4);
     --color-chart-3: var(--chart-3);
@@ -128,6 +132,10 @@
   }
   html {
     @apply font-sans;
+    /* Inter: SF-like single-storey alternates off; tabular figures where asked. */
+    font-feature-settings: "cv11" 1, "ss03" 1;
+    font-optical-sizing: auto;
+    letter-spacing: -0.01em;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     color-scheme: light;
@@ -246,17 +254,19 @@
 
 /* Journal paper backgrounds */
 .paper-lined {
+  /* One rule per 2rem line box, placed just under the text baseline. */
   background-color: var(--paper);
   background-image: linear-gradient(to bottom, transparent calc(2rem - 1px), var(--paper-line) calc(2rem - 1px));
   background-size: 100% 2rem;
-  background-position: 0 0.35rem;
+  background-position: 0 -0.3rem;
 }
 .paper-grid {
   background-color: var(--paper);
   background-image:
     linear-gradient(to right, var(--paper-line) 1px, transparent 1px),
     linear-gradient(to bottom, var(--paper-line) 1px, transparent 1px);
-  background-size: 1.25rem 1.25rem;
+  background-size: 1rem 1rem;
+  background-position: 1.25rem -0.3rem;
 }
 .paper-plain {
   background-color: var(--paper);

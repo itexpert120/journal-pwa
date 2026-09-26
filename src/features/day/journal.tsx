@@ -38,7 +38,7 @@ function JournalText({ value, onCommit, readOnly, placeholder }: { value: string
       readOnly={readOnly}
       placeholder={placeholder}
       aria-label="Journal text"
-      className="block field-sizing-content min-h-[55dvh] w-full resize-none bg-transparent px-5 pt-[0.35rem] font-serif text-[19px] leading-8 caret-primary outline-none placeholder:text-muted-foreground/60"
+      className="block field-sizing-content min-h-[55dvh] w-full resize-none bg-transparent px-5 py-0 font-serif text-[19px] leading-8 caret-primary outline-none placeholder:text-muted-foreground/60"
     />
   )
 }
@@ -97,10 +97,10 @@ export function JournalSection({ date, entry, patch }: SectionProps) {
 
         {/* The page: typed text underneath, handwriting canvas layered on top. */}
         <section
-          className={cn("relative overflow-hidden rounded-[1.625rem] shadow-[0_1px_2px_rgb(0_0_0/0.05)]", `paper-${paper}`, mode === "write" && "ring-2 ring-primary/50")}
+          className={cn("relative overflow-hidden rounded-[1.625rem] bg-paper shadow-[0_1px_2px_rgb(0_0_0/0.05)]", mode === "write" && "ring-2 ring-primary/50")}
           data-no-swipe={mode === "write" ? "" : undefined}
         >
-          <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-1">
+          <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3">
             <h3 className="text-[15px] font-semibold text-muted-foreground">Dear diary</h3>
             <Segmented<Paper>
               label="Paper"
@@ -114,7 +114,7 @@ export function JournalSection({ date, entry, patch }: SectionProps) {
               ]}
             />
           </div>
-          <div className="relative">
+          <div className={cn("relative pt-2 pb-6", `paper-${paper}`)}>
             <JournalText
               value={entry.journal.text}
               onCommit={(v) => patch((e) => void (e.journal.text = v))}
