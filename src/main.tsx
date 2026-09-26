@@ -76,6 +76,6 @@ if (isDesktop() && !import.meta.env.DEV) {
       load()
   })
   if (import.meta.env.PROD && "serviceWorker" in navigator) {
-    import("virtual:pwa-register").then(({ registerSW }) => registerSW({ immediate: true }))
+    import("./lib/pwa").then(({ setupPWA }) => setupPWA())
   }
 }

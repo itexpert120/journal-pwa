@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react"
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router"
 import { format, getDaysInMonth } from "date-fns"
 import { ChevronLeft, ChevronRight, Dumbbell, HeartPulse, ListChecks, NotebookPen, Share } from "lucide-react"
-import { flushSync } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DatePickerDrawer } from "@/components/date-picker-drawer"
@@ -18,6 +17,7 @@ import { HealthSection } from "@/features/day/health"
 import { FitnessSection } from "@/features/day/fitness"
 import { RoutineSection } from "@/features/day/routine"
 import { JournalSection } from "@/features/day/journal"
+import { PageTurner } from "@/features/day/page-turner"
 
 const SECTIONS = [
   { id: "health", label: "Health", icon: HeartPulse },
@@ -29,61 +29,18 @@ type SectionId = (typeof SECTIONS)[number]["id"]
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => format(new Date(2000, i, 1), "MMM"))
 
-/** Swipe/flip to another day, animating like turning a binder page. */
-function useFlipTo() {
+/** Navigate to another day, remembering which way the page should turn. */
+function useFlipTo(scroller: React.RefObject<HTMLElement | null>, setDir: (d: 1 | -1) => void) {
   const navigate = useNavigate()
   const [params] = useSearchParams()
   return async (target: ISODate, from: ISODate) => {
     if (target === from) return
     await prefetchEntry(target)
-    const dir = target > from ? "next" : "prev"
-    const to = `/day/${target}${params.size ? `?${params}` : ""}`
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (!document.startViewTransition || reduce) return navigate(to)
-    delete document.documentElement.dataset.nav
-    document.documentElement.dataset.flip = dir
-    const t = document.startViewTransition(() => flushSync(() => navigate(to)))
-    t.finished.finally(() => delete document.documentElement.dataset.flip)
+    setDir(target > from ? 1 : -1)
+    navigator.vibrate?.(8)
+    scroller.current?.scrollTo({ top: 0 })
+    navigate(`/day/${target}${params.size ? `?${params}` : ""}`, { replace: true })
   }
-}
-
-/** Horizontal swipe on the page body → prev/next day. Ignores vertical scrolls and marked widgets. */
-function useSwipe(onSwipe: (dir: 1 | -1) => void) {
-  const ref = useRef<HTMLElement>(null)
-  const cb = useRef(onSwipe)
-  cb.current = onSwipe
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    let x = 0,
-      y = 0,
-      t = 0,
-      skip = false
-    const start = (e: TouchEvent) => {
-      const target = e.target as HTMLElement
-      skip =
-        e.touches.length > 1 ||
-        !!target.closest("[data-no-swipe],input,textarea,canvas,[role=slider]") ||
-        // Leave the left edge alone: iOS uses it for back-swipe.
-        e.touches[0].clientX < 24
-      x = e.touches[0].clientX
-      y = e.touches[0].clientY
-      t = Date.now()
-    }
-    const end = (e: TouchEvent) => {
-      if (skip) return
-      const dx = e.changedTouches[0].clientX - x
-      const dy = e.changedTouches[0].clientY - y
-      if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.8 && Date.now() - t < 600) cb.current(dx < 0 ? 1 : -1)
-    }
-    el.addEventListener("touchstart", start, { passive: true })
-    el.addEventListener("touchend", end, { passive: true })
-    return () => {
-      el.removeEventListener("touchstart", start)
-      el.removeEventListener("touchend", end)
-    }
-  }, [])
-  return ref
 }
 
 export function Component() {
@@ -95,13 +52,14 @@ function DayPage({ date }: { date: ISODate }) {
   const [params, setParams] = useSearchParams()
   const section = (SECTIONS.find((s) => s.id === params.get("s"))?.id ?? "health") as SectionId
   const { entry, patch } = useEntry(date)
-  const flipTo = useFlipTo()
+  const scrollerRef = useRef<HTMLElement>(null)
+  const [dir, setDir] = useState<1 | -1>(1)
+  const flipTo = useFlipTo(scrollerRef, setDir)
   const [picker, setPicker] = useState(false)
   const d = fromISO(date)
   const isToday = date === todayISO()
-  const swipeRef = useSwipe((dir) => flipTo(shiftISO(date, dir), date))
   const monthStrip = useRef<HTMLDivElement>(null)
-  const scrolled = useScrolled(swipeRef)
+  const scrolled = useScrolled(scrollerRef)
 
   // Warm neighbours so swipes render instantly.
   useEffect(() => {
@@ -128,7 +86,7 @@ function DayPage({ date }: { date: ISODate }) {
 
   return (
     <Tabs value={section} onValueChange={(v) => setSection(String(v))} className="flex min-h-0 flex-1 flex-col gap-0">
-      <main ref={swipeRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <main ref={scrollerRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
       {/* Transparent nav layer: glass controls over a scroll-edge blur. */}
       <header className="no-print sticky top-0 z-20 pt-safe">
         <div aria-hidden className={cn("edge-top transition-opacity duration-200", scrolled ? "opacity-100" : "opacity-0")} />
@@ -211,7 +169,8 @@ function DayPage({ date }: { date: ISODate }) {
       </header>
 
         {entry && (
-          <div className={cn("vt-page mx-auto grid w-full max-w-5xl gap-6 bg-background px-4 pt-3 md:px-6", TAB_BAR_SPACE)}>
+          <PageTurner pageKey={date} direction={dir} onTurn={(d) => flipTo(shiftISO(date, d), date)}>
+          <div className={cn("mx-auto grid w-full max-w-5xl gap-6 px-4 pt-3 md:px-6", TAB_BAR_SPACE)}>
             <HeaderBlock date={date} entry={entry} patch={patch} />
             {/* Phones: one column of cards. Tablets: two-column card grid. */}
             <TabsContent value="health" className="grid items-start gap-4 md:grid-cols-2">
@@ -235,6 +194,7 @@ function DayPage({ date }: { date: ISODate }) {
               <Share /> Export this day
             </Button>
           </div>
+          </PageTurner>
         )}
       </main>
       <DatePickerDrawer open={picker} onOpenChange={setPicker} value={date} onPick={(t) => flipTo(t, date)} />

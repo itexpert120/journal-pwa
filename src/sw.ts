@@ -5,7 +5,10 @@ import { clientsClaim } from "workbox-core"
 
 declare const self: ServiceWorkerGlobalScope
 
-self.skipWaiting()
+// A new version waits until the page tells it to take over (lib/pwa.ts picks a safe moment).
+self.addEventListener("message", (e) => {
+  if (e.data?.type === "SKIP_WAITING") self.skipWaiting()
+})
 clientsClaim()
 cleanupOutdatedCaches()
 precacheAndRoute(self.__WB_MANIFEST)
