@@ -39,6 +39,7 @@ const router = createBrowserRouter([
           { path: "/profile", lazy: () => import("./routes/profile") },
           { path: "/more", lazy: () => import("./routes/more") },
           { path: "/more/occasions", lazy: () => import("./routes/occasions") },
+          { path: "/more/routine", lazy: () => import("./routes/routine") },
           { path: "/more/security", lazy: () => import("./routes/security") },
           { path: "/more/backup", lazy: () => import("./routes/backup") },
           { path: "/export", lazy: () => import("./routes/export") },

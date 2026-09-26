@@ -1,5 +1,6 @@
+import { useEffect, useRef, useState } from "react"
 import { Link, NavLink, Outlet, useLocation } from "react-router"
-import { BookOpen, CalendarDays, ChevronLeft, Menu, Search, UserRound } from "lucide-react"
+import { BookOpen, CalendarDays, ChevronLeft, Search, Settings, UserRound } from "lucide-react"
 import { todayISO } from "@/lib/date"
 import { cn } from "@/lib/utils"
 
@@ -8,7 +9,7 @@ const NAV = [
   { to: "/calendar", label: "Calendar", icon: CalendarDays },
   { to: "/search", label: "Search", icon: Search },
   { to: "/profile", label: "Profile", icon: UserRound },
-  { to: "/more", label: "More", icon: Menu },
+  { to: "/more", label: "Settings", icon: Settings },
 ] as const
 
 function NavItems({ rail }: { rail?: boolean }) {
@@ -68,8 +69,8 @@ export function AppShell() {
 }
 
 /**
- * Standard page: one scroll container with a sticky glass title bar,
- * so content blurs beneath the bar as it scrolls — like iOS navigation bars.
+ * Standard screen: one scroll container, a sticky glass nav bar, and an iOS
+ * large title that collapses into the bar as you scroll.
  */
 export function Page({
   title,
@@ -78,35 +79,79 @@ export function Page({
   className,
   bar,
   back,
+  backLabel,
   wide,
+  largeTitle = true,
 }: {
   title?: React.ReactNode
   actions?: React.ReactNode
   children: React.ReactNode
   className?: string
-  /** Replace the default title bar entirely. */
+  /** Replace the default nav bar entirely. */
   bar?: React.ReactNode
-  /** Parent route; renders a back chevron before the title. */
+  /** Parent route; renders "‹ Back" at the left of the bar. */
   back?: string
-  /** Let content use the full tablet width (grids) instead of a reading column. */
+  backLabel?: string
+  /** Let content use the full tablet width instead of a reading column. */
   wide?: boolean
+  largeTitle?: boolean
 }) {
+  const scroller = useRef<HTMLElement>(null)
+  const titleEl = useRef<HTMLHeadingElement>(null)
+  const [collapsed, setCollapsed] = useState(!largeTitle)
+
+  useEffect(() => {
+    if (!largeTitle || !titleEl.current) return
+    const io = new IntersectionObserver(([e]) => setCollapsed(!e.isIntersecting), {
+      root: scroller.current,
+      rootMargin: "-60px 0px 0px 0px",
+    })
+    io.observe(titleEl.current)
+    return () => io.disconnect()
+  }, [largeTitle])
+
+  const width = cn("mx-auto w-full px-4 md:px-8", !wide && "max-w-3xl")
   return (
-    <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+    <main ref={scroller} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
       {bar ?? (
-        <header className="no-print glass-bar sticky top-0 z-20 pt-safe">
-          <div className={cn("mx-auto flex h-14 w-full items-center gap-2 px-4 md:h-16 md:px-8", back && "pl-1 md:pl-4", !wide && "max-w-3xl")}>
-            {back && (
-              <Link to={back} viewTransition aria-label="Back" className="-mr-1 grid size-11 place-items-center rounded-full text-primary active:bg-muted">
-                <ChevronLeft className="size-7" />
-              </Link>
-            )}
-            <h1 className="min-w-0 flex-1 truncate text-[1.75rem] leading-none md:text-[2rem]">{title}</h1>
-            {actions}
+        <header
+          className={cn(
+            "no-print sticky top-0 z-20 pt-safe transition-[background-color,box-shadow,backdrop-filter] duration-200",
+            collapsed ? "glass-bar" : "bg-background",
+          )}
+        >
+          <div className={cn(width, "grid h-12 grid-cols-[1fr_auto_1fr] items-center gap-2 px-2 md:px-6")}>
+            <div className="min-w-0">
+              {back && (
+                <Link
+                  to={back}
+                  viewTransition
+                  className="-ml-1 flex h-11 w-fit max-w-full items-center rounded-full pr-2 text-[17px] text-primary active:opacity-50"
+                >
+                  <ChevronLeft className="size-7 shrink-0" strokeWidth={2.2} />
+                  <span className="truncate">{backLabel ?? "Back"}</span>
+                </Link>
+              )}
+            </div>
+            <span
+              className={cn(
+                "truncate text-[17px] font-semibold transition-opacity duration-200",
+                collapsed ? "opacity-100" : "opacity-0",
+              )}
+              aria-hidden={!collapsed}
+            >
+              {title}
+            </span>
+            <div className="flex min-w-0 items-center justify-end gap-1">{actions}</div>
           </div>
         </header>
       )}
-      <div className={cn("mx-auto w-full px-4 pt-4 md:px-8 md:pt-6", TAB_BAR_SPACE, !wide && "max-w-3xl", className)}>
+      <div className={cn(width, "pt-1", TAB_BAR_SPACE, className)}>
+        {largeTitle && title && (
+          <h1 ref={titleEl} className="mb-4 px-1 text-[2.125rem] leading-tight md:text-[2.5rem]">
+            {title}
+          </h1>
+        )}
         {children}
       </div>
     </main>

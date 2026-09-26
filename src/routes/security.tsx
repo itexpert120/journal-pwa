@@ -1,130 +1,140 @@
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import { Fingerprint, KeyRound, Lock, ShieldCheck } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
+import { Fingerprint, KeyRound, Lock, Timer } from "lucide-react"
 import { Page } from "@/components/app-shell"
-import { Field } from "@/components/fields"
-import { Section } from "@/components/section"
+import { ActionRow, EditSheet, FieldRow, Group, Row, SelectRow, SwitchRow } from "@/components/ios"
 import { hashPin } from "@/lib/crypto"
 import { biometricsAvailable, enrollBiometric, getLockConfig, lockStore, setLockConfig, type LockConfig } from "@/lib/lock"
 
 const AUTO_LOCK = [
-  [0, "Immediately"],
-  [1, "After 1 min"],
-  [5, "After 5 min"],
-  [15, "After 15 min"],
-] as const
+  { value: "0", label: "Immediately" },
+  { value: "1", label: "After 1 minute" },
+  { value: "5", label: "After 5 minutes" },
+  { value: "15", label: "After 15 minutes" },
+]
 
-export function Component() {
-  const [cfg, setCfg] = useState<LockConfig>()
-  const [bioOk, setBioOk] = useState(false)
+function PinSheet({ open, onOpenChange, onSave }: { open: boolean; onOpenChange: (o: boolean) => void; onSave: (pin: string) => void }) {
   const [pin, setPin] = useState("")
   const [pin2, setPin2] = useState("")
-
-  useEffect(() => {
-    getLockConfig().then(setCfg)
-    biometricsAvailable().then(setBioOk)
-  }, [])
-  if (!cfg) return <Page title="App lock" back="/more">{null}</Page>
-
-  const save = async (c: LockConfig) => {
-    await setLockConfig(c)
-    setCfg(c)
-  }
-
-  const setPinCode = async () => {
-    if (!/^\d{4,6}$/.test(pin)) return toast.error("PIN must be 4–6 digits")
-    if (pin !== pin2) return toast.error("PINs don't match")
-    await save({ ...cfg, enabled: true, pin: await hashPin(pin) })
-    setPin("")
-    setPin2("")
-    toast.success("App lock is on")
-  }
-
-  const pinInput = (v: string, set: (s: string) => void, label: string) => (
-    <Field label={label}>
-      <Input
+  const input = (v: string, set: (s: string) => void, label: string) => (
+    <FieldRow label={label}>
+      <input
         type="password"
         inputMode="numeric"
         autoComplete="off"
         maxLength={6}
         value={v}
         onChange={(e) => set(e.target.value.replace(/\D/g, ""))}
-        className="text-center text-2xl tracking-[0.5em]"
+        className="min-w-0 flex-1 bg-transparent py-3 text-right text-xl tracking-[0.4em] outline-none"
       />
-    </Field>
+    </FieldRow>
   )
+  const save = () => {
+    if (!/^\d{4,6}$/.test(pin)) return toast.error("Passcode must be 4–6 digits")
+    if (pin !== pin2) return toast.error("Passcodes don't match")
+    onSave(pin)
+    setPin("")
+    setPin2("")
+    onOpenChange(false)
+  }
+  return (
+    <EditSheet open={open} onOpenChange={onOpenChange} title="Set Passcode">
+      <Group footer="Use 4 to 6 digits.">
+        {input(pin, setPin, "New Passcode")}
+        {input(pin2, setPin2, "Confirm")}
+      </Group>
+      <Group>
+        <ActionRow onClick={save}>Save Passcode</ActionRow>
+      </Group>
+    </EditSheet>
+  )
+}
+
+export function Component() {
+  const [cfg, setCfg] = useState<LockConfig>()
+  const [bioOk, setBioOk] = useState(false)
+  const [pinSheet, setPinSheet] = useState(false)
+
+  useEffect(() => {
+    getLockConfig().then(setCfg)
+    biometricsAvailable().then(setBioOk)
+  }, [])
+  if (!cfg) return <Page title="Passcode" back="/more" backLabel="Settings">{null}</Page>
+
+  const save = async (c: LockConfig) => {
+    await setLockConfig(c)
+    setCfg(c)
+  }
 
   return (
-    <Page title="App lock" back="/more">
-      <div className="grid gap-4">
-        <Section title={cfg.enabled ? "Lock is on" : "Lock is off"} icon={cfg.enabled ? ShieldCheck : Lock}>
-          <p className="text-sm text-muted-foreground">
-            Require a PIN{bioOk ? " or Face ID / fingerprint" : ""} to open your journal. Emergency medical info stays
-            reachable from the lock screen.
-          </p>
-          {cfg.enabled && (
+    <Page title="Passcode & Face ID" back="/more" backLabel="Settings">
+      <div className="grid gap-8">
+        <Group footer="Emergency medical info stays available from the lock screen, like Medical ID.">
+          {cfg.pin ? (
             <>
-              <label className="flex min-h-12 items-center gap-3">
-                <span className="flex-1">Enable lock</span>
-                <Switch
-                  checked={cfg.enabled}
-                  onCheckedChange={(c) => save({ ...cfg, enabled: c, ...(c ? {} : { pin: undefined, credentialId: undefined }) })}
-                />
-              </label>
-              <Field label="Auto-lock" group>
-                <div className="grid grid-cols-2 gap-2">
-                  {AUTO_LOCK.map(([m, l]) => (
-                    <Button key={m} variant={cfg.autoLockMinutes === m ? "default" : "outline"} onClick={() => save({ ...cfg, autoLockMinutes: m })}>
-                      {l}
-                    </Button>
-                  ))}
-                </div>
-              </Field>
-              <Button variant="secondary" onClick={() => lockStore.set(true)}>
-                <Lock /> Lock now
-              </Button>
+              <SwitchRow
+                icon={Lock}
+                color="gray"
+                label="Require Passcode"
+                checked={cfg.enabled}
+                onChange={(c) => save({ ...cfg, enabled: c })}
+              />
+              <Row icon={KeyRound} color="blue" label="Change Passcode" chevron onClick={() => setPinSheet(true)} />
             </>
+          ) : (
+            <Row icon={KeyRound} color="blue" label="Turn Passcode On" chevron onClick={() => setPinSheet(true)} />
           )}
-        </Section>
+        </Group>
 
-        <Section title={cfg.pin ? "Change PIN" : "Set a PIN"} icon={KeyRound}>
-          {pinInput(pin, setPin, "New PIN (4–6 digits)")}
-          {pinInput(pin2, setPin2, "Confirm PIN")}
-          <Button size="lg" onClick={setPinCode} disabled={pin.length < 4}>
-            {cfg.pin ? "Update PIN" : "Turn on lock"}
-          </Button>
-        </Section>
-
-        {bioOk && cfg.pin && (
-          <Section title="Face ID / fingerprint" icon={Fingerprint}>
-            {cfg.credentialId ? (
-              <>
-                <p className="text-sm text-emerald-700 dark:text-emerald-400">✓ Biometric unlock is set up.</p>
-                <Button variant="outline" onClick={() => save({ ...cfg, credentialId: undefined })}>
-                  Remove biometric unlock
-                </Button>
-              </>
-            ) : (
-              <Button
-                size="lg"
-                onClick={async () => {
-                  try {
-                    await save({ ...cfg, credentialId: await enrollBiometric() })
-                    toast.success("Biometric unlock enabled")
-                  } catch {
-                    toast.error("Couldn't set up biometrics")
-                  }
-                }}
-              >
-                <Fingerprint /> Enable biometric unlock
-              </Button>
+        {cfg.pin && cfg.enabled && (
+          <>
+            {bioOk && (
+              <Group footer="Unlock with Face ID, Touch ID or your fingerprint instead of typing your passcode.">
+                <SwitchRow
+                  icon={Fingerprint}
+                  color="green"
+                  label="Biometric Unlock"
+                  checked={!!cfg.credentialId}
+                  onChange={async (on) => {
+                    if (!on) return save({ ...cfg, credentialId: undefined })
+                    try {
+                      await save({ ...cfg, credentialId: await enrollBiometric() })
+                    } catch {
+                      toast.error("Couldn't set up biometrics")
+                    }
+                  }}
+                />
+              </Group>
             )}
-          </Section>
+            <Group>
+              <SelectRow
+                icon={Timer}
+                color="orange"
+                label="Auto-Lock"
+                value={String(cfg.autoLockMinutes)}
+                options={AUTO_LOCK}
+                onChange={(v) => save({ ...cfg, autoLockMinutes: Number(v) })}
+              />
+            </Group>
+            <Group>
+              <ActionRow onClick={() => lockStore.set(true)}>Lock Now</ActionRow>
+            </Group>
+            <Group>
+              <ActionRow destructive onClick={() => save({ ...cfg, enabled: false, pin: undefined, credentialId: undefined })}>
+                Turn Passcode Off
+              </ActionRow>
+            </Group>
+          </>
         )}
       </div>
+      <PinSheet
+        open={pinSheet}
+        onOpenChange={setPinSheet}
+        onSave={async (pin) => {
+          await save({ ...cfg, enabled: true, pin: await hashPin(pin) })
+          toast.success("Passcode set")
+        }}
+      />
     </Page>
   )
 }

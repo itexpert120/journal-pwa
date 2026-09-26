@@ -126,7 +126,7 @@ function Routine({ entry, patch }: SectionProps) {
           </CheckRow>
         ))}
       </ul>
-      <Link to="/more#routine" className="text-sm text-primary">
+      <Link to="/more/routine" className="text-sm text-primary">
         Edit routine
       </Link>
       <h3 className="mt-2 text-sm font-medium text-muted-foreground">Today's tasks</h3>
