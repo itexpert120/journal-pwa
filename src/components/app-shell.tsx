@@ -1,5 +1,5 @@
-import { NavLink, Outlet, useLocation } from "react-router"
-import { BookOpen, CalendarDays, Menu, Search, UserRound } from "lucide-react"
+import { Link, NavLink, Outlet, useLocation } from "react-router"
+import { BookOpen, CalendarDays, ChevronLeft, Menu, Search, UserRound } from "lucide-react"
 import { todayISO } from "@/lib/date"
 import { cn } from "@/lib/utils"
 
@@ -57,7 +57,10 @@ export function Page({
   children,
   className,
   bar,
+  back,
 }: {
+  /** Parent route; renders a back chevron before the title. */
+  back?: string
   title?: React.ReactNode
   actions?: React.ReactNode
   children: React.ReactNode
@@ -69,7 +72,12 @@ export function Page({
     <>
       {bar ?? (
         <header className="no-print z-20 shrink-0 border-b bg-background/95 pt-safe backdrop-blur">
-          <div className="flex h-14 items-center gap-2 px-4">
+          <div className={cn("flex h-14 items-center gap-2 px-4", back && "pl-1")}>
+            {back && (
+              <Link to={back} viewTransition aria-label="Back" className="grid size-11 place-items-center rounded-lg active:bg-muted">
+                <ChevronLeft className="size-6" />
+              </Link>
+            )}
             <h1 className="min-w-0 flex-1 truncate text-3xl leading-none">{title}</h1>
             {actions}
           </div>

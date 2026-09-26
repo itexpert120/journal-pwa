@@ -9,6 +9,8 @@ import { RouteError } from "./components/route-error"
 import { isISODate, todayISO } from "./lib/date"
 import { initTheme } from "./lib/theme"
 import { initLock } from "./lib/lock"
+// Side effect: capture beforeinstallprompt early, before the More screen loads.
+import "./lib/install"
 
 initTheme()
 
