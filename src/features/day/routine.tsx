@@ -1,97 +1,87 @@
 import { useState } from "react"
 import { Link } from "react-router"
 import { useLiveQuery } from "dexie-react-hooks"
-import { CalendarClock, Clock, ListChecks, Target, Trophy } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { TextAreaField } from "@/components/fields"
-import { Empty, RemoveButton, Section } from "@/components/section"
-import { db, type Entry, type Todo } from "@/lib/db"
-import { formatTime12 } from "@/lib/date"
+import { format } from "date-fns"
+import { CirclePlus, X } from "lucide-react"
+import { CheckRow, DateTimeRow, EditSheet, Group, NoteRow, Row, TextRow } from "@/components/ios"
+import { db, type TimedEvent, type Todo } from "@/lib/db"
+import { formatTime12, fromISO } from "@/lib/date"
 import { uid } from "@/lib/id"
+import { setNav } from "@/lib/nav"
 import { useSettings } from "@/lib/profile"
 import { cn } from "@/lib/utils"
 import type { SectionProps } from "./types"
 
-function CheckRow({
-  checked,
-  onChecked,
-  children,
-  onRemove,
-}: {
-  checked: boolean
-  onChecked: (c: boolean) => void
-  children: React.ReactNode
-  onRemove?: () => void
-}) {
-  return (
-    <li className="flex items-center">
-      <label className="flex min-h-12 flex-1 items-center gap-3 rounded-lg px-1 active:bg-muted">
-        <Checkbox
-          checked={checked}
-          onCheckedChange={(c) => {
-            navigator.vibrate?.(8)
-            onChecked(!!c)
-          }}
-        />
-        <span className={cn("flex-1", checked && "text-muted-foreground line-through")}>{children}</span>
-      </label>
-      {onRemove && <RemoveButton onClick={onRemove} />}
-    </li>
-  )
-}
-
-/** Single-line "type and press enter" adder — the fastest mobile pattern for lists. */
-function QuickAdd({ placeholder, onAdd }: { placeholder: string; onAdd: (text: string) => void }) {
+/** "New item" row: plus icon + inline field, submit with Return. */
+function AddRow({ placeholder, onAdd }: { placeholder: string; onAdd: (text: string) => void }) {
   const [v, setV] = useState("")
+  const commit = () => {
+    if (v.trim()) onAdd(v.trim())
+    setV("")
+  }
   return (
     <form
+      className="flex min-h-[52px] items-center gap-3 pl-4"
       onSubmit={(e) => {
         e.preventDefault()
-        if (!v.trim()) return
-        onAdd(v.trim())
-        setV("")
+        commit()
       }}
     >
-      <Input value={v} onChange={(e) => setV(e.target.value)} placeholder={placeholder} enterKeyHint="done" />
+      <CirclePlus className="size-6 shrink-0 fill-primary text-white" />
+      <input
+        value={v}
+        onChange={(e) => setV(e.target.value)}
+        onBlur={commit}
+        placeholder={placeholder}
+        enterKeyHint="done"
+        className="min-w-0 flex-1 bg-transparent py-3 pr-4 text-[17px] outline-none placeholder:text-muted-foreground/70"
+      />
     </form>
   )
 }
 
-function TodoList({
-  items,
-  field,
-  patch,
-  placeholder,
-}: {
-  items: Todo[]
-  field: "tasks" | "goals"
-  patch: SectionProps["patch"]
-  placeholder: string
-}) {
+function TodoRows({ items, field, patch }: { items: Todo[]; field: "tasks" | "goals"; patch: SectionProps["patch"] }) {
+  return items.map((t) => (
+    <CheckRow
+      key={t.id}
+      checked={t.done}
+      onChange={(c) =>
+        patch((e) => {
+          const x = e[field].find((y) => y.id === t.id)
+          if (x) x.done = c
+        })
+      }
+      label={t.text}
+      trailing={
+        <button
+          type="button"
+          aria-label={`Delete ${t.text}`}
+          onClick={(ev) => {
+            ev.preventDefault()
+            patch((e) => void (e[field] = e[field].filter((y) => y.id !== t.id)))
+          }}
+          className="-mr-2 grid size-9 place-items-center rounded-full text-muted-foreground/70 active:bg-muted"
+        >
+          <X className="size-4" />
+        </button>
+      }
+    />
+  ))
+}
+
+function FollowUps({ date }: { date: string }) {
+  const due = useLiveQuery(
+    async () =>
+      (await db.entries.toArray()).flatMap((e) => e.checkups.filter((c) => c.followUp === date).map((c) => ({ ...c, from: e.date }))),
+    [date],
+  )
+  if (!due?.length) return null
   return (
-    <>
-      {items.length > 0 && (
-        <ul className="grid">
-          {items.map((t) => (
-            <CheckRow
-              key={t.id}
-              checked={t.done}
-              onChecked={(c) =>
-                patch((e) => {
-                  const x = e[field].find((y) => y.id === t.id)
-                  if (x) x.done = c
-                })
-              }
-              onRemove={() => patch((e) => void (e[field] = e[field].filter((y) => y.id !== t.id)))}
-            >
-              {t.text}
-            </CheckRow>
-          ))}
-        </ul>
-      )}
-      <QuickAdd placeholder={placeholder} onAdd={(text) => patch((e) => void e[field].push({ id: uid(), text, done: false }))} />
-    </>
+    <Group header="Follow-ups Due">
+      {due.map((c) => (
+        <Row key={c.id} label={c.title || c.kind} detail={`From ${format(fromISO(c.from), "d MMM yyyy")}`} to={`/day/${c.from}?s=health`} />
+      ))}
+    </Group>
   )
 }
 
@@ -100,177 +90,128 @@ function Routine({ entry, patch }: SectionProps) {
   const routine = settings?.routine ?? []
   const done = routine.filter((r) => entry.routineDone[r.id]).length
   return (
-    <Section
-      title="Daily routine"
-      icon={ListChecks}
+    <Group
+      header="Routine"
       action={
-        <span className="text-sm text-muted-foreground tabular-nums">
-          {done}/{routine.length}
-        </span>
+        <Link to="/more/routine" viewTransition onClick={() => setNav("push")}>
+          Edit
+        </Link>
       }
+      footer={routine.length ? `${done} of ${routine.length} done` : "Set up your daily non-negotiables."}
     >
-      {routine.length === 0 && <Empty>No routine items yet.</Empty>}
-      <ul className="grid">
-        {routine.map((r) => (
-          <CheckRow
-            key={r.id}
-            checked={!!entry.routineDone[r.id]}
-            onChecked={(c) =>
-              patch((e) => {
-                if (c) e.routineDone[r.id] = true
-                else delete e.routineDone[r.id]
-              })
-            }
-          >
-            {r.text}
-          </CheckRow>
-        ))}
-      </ul>
-      <Link to="/more/routine" className="text-sm text-primary">
-        Edit routine
-      </Link>
-      <h3 className="mt-2 text-sm font-medium text-muted-foreground">Today's tasks</h3>
-      <TodoList items={entry.tasks} field="tasks" patch={patch} placeholder="Add a task…" />
-    </Section>
-  )
-}
-
-function EventRow({ ev, patch }: { ev: Entry["events"][number]; patch: SectionProps["patch"] }) {
-  return (
-    <div className="flex items-center gap-2 rounded-lg bg-primary/10 py-1 pl-3 text-sm">
-      <span className="text-xs font-medium text-primary tabular-nums">{formatTime12(ev.time)}</span>
-      <span className="flex-1 font-medium">{ev.title}</span>
-      <RemoveButton onClick={() => patch((e) => void (e.events = e.events.filter((x) => x.id !== ev.id)))} />
-    </div>
+      {routine.map((r) => (
+        <CheckRow
+          key={r.id}
+          checked={!!entry.routineDone[r.id]}
+          onChange={(c) =>
+            patch((e) => {
+              if (c) e.routineDone[r.id] = true
+              else delete e.routineDone[r.id]
+            })
+          }
+          label={r.text}
+        />
+      ))}
+      {routine.length === 0 && <Row label="Add Routine Items" to="/more/routine" />}
+    </Group>
   )
 }
 
 const HOURS = Array.from({ length: 17 }, (_, i) => i + 6) // 06:00 → 22:00
 
-function TimeLadder({ entry, patch }: SectionProps) {
-  const [adding, setAdding] = useState<string>()
-  const [title, setTitle] = useState("")
-  const hourOf = (t: string) => Number(t.slice(0, 2))
-  const outside = entry.events.filter((ev) => hourOf(ev.time) < 6 || hourOf(ev.time) > 22)
-
-  const commit = () => {
-    if (adding && title.trim()) {
-      const time = adding
-      patch((e) => {
-        e.events.push({ id: uid(), time, title: title.trim() })
-        e.events.sort((a, b) => a.time.localeCompare(b.time))
-      })
-    }
-    setAdding(undefined)
-    setTitle("")
+function Schedule({ entry, patch }: SectionProps) {
+  const [edit, setEdit] = useState<string>()
+  const ev = entry.events.find((x) => x.id === edit)
+  const upd = (fn: (x: TimedEvent) => void) =>
+    patch((e) => {
+      const x = e.events.find((y) => y.id === edit)
+      if (x) fn(x)
+      e.events.sort((a, b) => a.time.localeCompare(b.time))
+    })
+  const add = (time: string) => {
+    const id = uid()
+    patch((e) => void e.events.push({ id, time, title: "" })).then(() => setEdit(id))
   }
+  const hourOf = (t: string) => Number(t.slice(0, 2))
+  const outside = entry.events.filter((x) => hourOf(x.time) < 6 || hourOf(x.time) > 22)
+  const nowHour = new Date().getHours()
 
   return (
-    <Section title="Schedule" icon={Clock}>
-      <p className="-mt-1 text-xs text-muted-foreground">Tap an hour to add an event.</p>
-      <ol className="grid">
+    <Group header="Schedule" footer="Tap an hour to add an event.">
+      <ol className="py-1.5">
         {HOURS.map((h) => {
           const hh = String(h).padStart(2, "0")
-          const evs = entry.events.filter((ev) => hourOf(ev.time) === h)
+          const evs = entry.events.filter((x) => hourOf(x.time) === h)
           return (
-            <li key={h} className="grid grid-cols-[3.5rem_1fr] border-t border-dashed first:border-t-0">
-              <button
-                type="button"
-                className="h-11 text-left text-xs text-muted-foreground tabular-nums active:text-primary"
-                onClick={() => setAdding(`${hh}:00`)}
-              >
-                {formatTime12(`${hh}:00`)}
-              </button>
-              <div className="grid content-center gap-1 py-1">
-                {evs.map((ev) => (
-                  <EventRow key={ev.id} ev={ev} patch={patch} />
-                ))}
-                {adding?.startsWith(hh) ? (
-                  <form
-                    className="flex gap-2"
-                    onSubmit={(e) => {
-                      e.preventDefault()
-                      commit()
-                    }}
+            <li key={h} className="grid min-h-11 grid-cols-[4.25rem_1fr] items-start">
+              <span className={cn("pt-3 pl-4 text-[13px] text-muted-foreground tabular-nums", h === nowHour && "font-semibold text-alert")}>
+                {formatTime12(`${hh}:00`).replace(":00", "")}
+              </span>
+              <div className="grid min-h-11 content-center gap-1 border-t border-border/60 py-1 pr-4">
+                {evs.map((x) => (
+                  <button
+                    key={x.id}
+                    type="button"
+                    onClick={() => setEdit(x.id)}
+                    className="flex items-center gap-2 rounded-lg border-l-[3px] border-primary bg-primary/12 px-2.5 py-1.5 text-left text-[15px] active:opacity-70"
                   >
-                    <Input
-                      type="time"
-                      value={adding}
-                      onChange={(e) => setAdding(e.target.value || adding)}
-                      className="w-28 shrink-0"
-                      aria-label="Event time"
-                    />
-                    <Input
-                      autoFocus
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      onBlur={commit}
-                      placeholder="Event"
-                      enterKeyHint="done"
-                    />
-                  </form>
-                ) : (
-                  evs.length === 0 && <button type="button" aria-label={`Add event at ${h}:00`} className="h-9" onClick={() => setAdding(`${hh}:00`)} />
+                    <span className="font-semibold text-primary tabular-nums">{formatTime12(x.time)}</span>
+                    <span className="truncate">{x.title || "New Event"}</span>
+                  </button>
+                ))}
+                {evs.length === 0 && (
+                  <button type="button" aria-label={`Add event at ${h}:00`} onClick={() => add(`${hh}:00`)} className="h-9 w-full rounded-lg active:bg-muted" />
                 )}
               </div>
             </li>
           )
         })}
       </ol>
-      {outside.map((ev) => (
-        <EventRow key={ev.id} ev={ev} patch={patch} />
+      {outside.map((x) => (
+        <Row key={x.id} label={x.title || "New Event"} value={formatTime12(x.time)} onClick={() => setEdit(x.id)} chevron />
       ))}
-    </Section>
-  )
-}
-
-function FollowUps({ date }: { date: string }) {
-  const due = useLiveQuery(
-    async () =>
-      (await db.entries.toArray()).flatMap((e) =>
-        e.checkups.filter((c) => c.followUp === date).map((c) => ({ ...c, from: e.date })),
-      ),
-    [date],
-  )
-  if (!due?.length) return null
-  return (
-    <Section title="Follow-ups due" icon={CalendarClock} className="border-primary/40">
-      {due.map((c) => (
-        <Link key={c.id} to={`/day/${c.from}?s=health`} className="rounded-lg bg-muted/60 p-3 text-sm active:bg-muted">
-          <p className="font-medium">{c.title || c.kind}</p>
-          <p className="text-xs text-muted-foreground">From {c.from}</p>
-        </Link>
-      ))}
-    </Section>
-  )
-}
-
-function Goals({ entry, patch }: SectionProps) {
-  return (
-    <Section title="Goals & wins" icon={Target}>
-      <TodoList items={entry.goals} field="goals" patch={patch} placeholder="Add a micro-goal…" />
-      <div className="mt-2 grid gap-2 rounded-2xl bg-accent p-3">
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-accent-foreground">
-          <Trophy className="size-4" /> Win of the day
-        </h3>
-        <TextAreaField
-          value={entry.win}
-          onCommit={(v) => patch((e) => void (e.win = v))}
-          placeholder="Something you're proud of today…"
-          className="border-0 bg-transparent px-0 shadow-none focus-visible:ring-0 dark:bg-transparent"
-        />
-      </div>
-    </Section>
+      <EditSheet
+        open={!!ev}
+        onOpenChange={(o) => {
+          if (o) return
+          const id = edit
+          setEdit(undefined)
+          // Drop events left untitled once pending edits have flushed.
+          setTimeout(() => patch((e) => void (e.events = e.events.filter((x) => x.id !== id || x.title.trim()))), 900)
+        }}
+        title="Event"
+        onDelete={() => patch((e) => void (e.events = e.events.filter((x) => x.id !== edit)))}
+        deleteLabel="Delete Event"
+      >
+        {ev && (
+          <Group>
+            <TextRow label="Title" value={ev.title} onCommit={(v) => upd((x) => void (x.title = v))} placeholder="Event" autoFocus={!ev.title} />
+            <DateTimeRow label="Time" type="time" value={ev.time} onChange={(v) => v && upd((x) => void (x.time = v))} />
+          </Group>
+        )}
+      </EditSheet>
+    </Group>
   )
 }
 
 export function RoutineSection(props: SectionProps) {
+  const { entry, patch } = props
   return (
     <>
       <FollowUps date={props.date} />
       <Routine {...props} />
-      <Goals {...props} />
-      <TimeLadder {...props} />
+      <Group header="Tasks">
+        <TodoRows items={entry.tasks} field="tasks" patch={patch} />
+        <AddRow placeholder="New Task" onAdd={(text) => patch((e) => void e.tasks.push({ id: uid(), text, done: false }))} />
+      </Group>
+      <Group header="Micro-goals">
+        <TodoRows items={entry.goals} field="goals" patch={patch} />
+        <AddRow placeholder="New Goal" onAdd={(text) => patch((e) => void e.goals.push({ id: uid(), text, done: false }))} />
+      </Group>
+      <Group header="Win of the Day">
+        <NoteRow value={entry.win} onCommit={(v) => patch((e) => void (e.win = v))} placeholder="Something you're proud of today…" rows={2} />
+      </Group>
+      <Schedule {...props} />
     </>
   )
 }
