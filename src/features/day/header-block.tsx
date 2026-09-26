@@ -72,7 +72,7 @@ function WeatherChip({ date, entry, patch }: SectionProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex h-full min-h-16 flex-col items-center justify-center rounded-xl bg-muted/70 px-3 active:bg-muted"
+        className="flex h-full min-h-16 w-16 flex-col items-center justify-center rounded-2xl bg-muted/70 transition-transform active:scale-95"
         aria-label={w ? `Weather: ${info!.label}, ${w.temp}°` : "Add weather"}
       >
         {loading ? (
@@ -146,14 +146,16 @@ function WeatherChip({ date, entry, patch }: SectionProps) {
 export function HeaderBlock(props: SectionProps) {
   const { date, entry, patch } = props
   return (
-    <div className="grid gap-4">
-      <Occasions date={date} />
-      <figure className="relative rounded-2xl bg-leather px-5 py-4 text-leather-foreground">
+    <div className="grid gap-4 md:grid-cols-2">
+      <div className="md:col-span-2 empty:hidden">
+        <Occasions date={date} />
+      </div>
+      <figure className="relative flex items-center rounded-3xl bg-leather px-5 py-4 text-leather-foreground">
         <Quote className="absolute top-3 left-3 size-4 opacity-40" />
-        <blockquote className="pl-4 font-heading text-xl leading-snug italic">{quoteFor(date)}</blockquote>
+        <blockquote className="pl-4 font-heading text-xl leading-snug italic md:text-2xl">{quoteFor(date)}</blockquote>
       </figure>
 
-      <div className="grid grid-cols-[1fr_auto] gap-3 rounded-2xl border bg-card p-3">
+      <div className="grid grid-cols-[1fr_auto] gap-3 rounded-3xl border bg-card p-3">
         <div className="grid gap-3">
           <div role="radiogroup" aria-label="Mood" className="flex justify-between">
             {MOODS.map((m) => {

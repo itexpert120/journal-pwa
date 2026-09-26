@@ -57,6 +57,7 @@ export function JournalSection({ date, entry, patch }: SectionProps) {
       <Section
         title="Journal"
         icon={NotebookPen}
+        className="md:col-span-2"
         action={
           <ToggleGroup
             value={[paper]}
@@ -166,7 +167,7 @@ export function JournalSection({ date, entry, patch }: SectionProps) {
         {/* The page: typed text underneath, handwriting canvas layered on top. */}
         <div
           className={cn(
-            "relative -mx-4 min-h-[60dvh] border-y",
+            "relative -mx-4 min-h-[60dvh] border-y md:-mx-5",
             `paper-${paper}`,
             mode === "write" && "ring-2 ring-primary/40 ring-inset",
           )}
@@ -205,7 +206,7 @@ export function JournalSection({ date, entry, patch }: SectionProps) {
         )}
       </Section>
 
-      <Section title="Memories" icon={Images}>
+      <Section title="Memories" icon={Images} className="md:col-span-2">
         <PhotoGallery
           date={date}
           photos={entry.photos}

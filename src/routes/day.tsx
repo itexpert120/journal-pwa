@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { Link, useNavigate, useParams, useSearchParams } from "react-router"
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router"
 import { format, getDaysInMonth } from "date-fns"
 import { ChevronLeft, ChevronRight, Dumbbell, HeartPulse, ListChecks, NotebookPen, Share } from "lucide-react"
 import { flushSync } from "react-dom"
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DatePickerDrawer } from "@/components/date-picker-drawer"
 import { useEntry, prefetchEntry } from "@/hooks/use-entry"
-import { fromISO, shiftISO, toISO, todayISO, type ISODate } from "@/lib/date"
+import { fromISO, isISODate, shiftISO, toISO, todayISO, type ISODate } from "@/lib/date"
 import { cn } from "@/lib/utils"
 import { HeaderBlock } from "@/features/day/header-block"
 import { HealthSection } from "@/features/day/health"
@@ -82,7 +82,11 @@ function useSwipe(onSwipe: (dir: 1 | -1) => void) {
 }
 
 export function Component() {
-  const { date = todayISO() } = useParams()
+  const { date = "" } = useParams()
+  return isISODate(date) ? <DayPage date={date} /> : <Navigate to={`/day/${todayISO()}`} replace />
+}
+
+function DayPage({ date }: { date: ISODate }) {
   const [params, setParams] = useSearchParams()
   const section = (SECTIONS.find((s) => s.id === params.get("s"))?.id ?? "health") as SectionId
   const { entry, patch } = useEntry(date)
@@ -111,39 +115,57 @@ export function Component() {
     flipTo(toISO(new Date(d.getFullYear(), m, Math.min(d.getDate(), getDaysInMonth(first)))), date)
   }
 
+  const setSection = (v: string) => {
+    navigator.vibrate?.(6)
+    setParams({ s: v }, { replace: true })
+  }
+
   return (
-    <>
+    <Tabs value={section} onValueChange={(v) => setSection(String(v))} className="flex min-h-0 flex-1 flex-col gap-0">
       <header className="no-print z-20 shrink-0 border-b bg-background pt-safe">
-        <div className="flex h-16 items-center gap-1 px-2">
+        <div className="mx-auto flex h-16 w-full max-w-5xl items-center gap-1 px-2 md:h-18 md:px-6">
           <Button variant="ghost" size="icon" aria-label="Previous day" onClick={() => flipTo(shiftISO(date, -1), date)}>
-            <ChevronLeft />
+            <ChevronLeft className="size-6" />
           </Button>
           <button
             type="button"
-            className="flex min-w-0 flex-1 flex-col items-center rounded-lg py-1 active:bg-muted"
+            className="flex min-w-0 flex-1 flex-col items-center rounded-xl py-1 transition-transform active:scale-[0.97] md:items-start md:px-2"
             onClick={() => setPicker(true)}
             aria-label={`Change date, currently ${format(d, "EEEE d MMMM yyyy")}`}
           >
-            <span className="font-heading text-[1.7rem] leading-none">{format(d, "EEEE")}</span>
-            <span className="text-xs text-muted-foreground tabular-nums">{format(d, "d MMMM yyyy")}</span>
+            <span className="font-heading text-[1.85rem] leading-none md:text-[2.4rem]">{format(d, "EEEE")}</span>
+            <span className="text-[13px] font-medium text-muted-foreground tabular-nums">
+              {format(d, "d MMMM yyyy")}
+              {isToday && <span className="ml-1.5 text-primary">· Today</span>}
+            </span>
           </button>
+          {!isToday && (
+            <Button size="sm" variant="secondary" className="rounded-full" onClick={() => flipTo(todayISO(), date)}>
+              Today
+            </Button>
+          )}
           <Button variant="ghost" size="icon" aria-label="Next day" onClick={() => flipTo(shiftISO(date, 1), date)}>
-            <ChevronRight />
+            <ChevronRight className="size-6" />
           </Button>
         </div>
+
         {/* Binder dividers: permanent Profile tab, then year + month tabs. */}
-        <div ref={monthStrip} className="flex items-end gap-1 overflow-x-auto px-2 scrollbar-none" data-no-swipe>
+        <div
+          ref={monthStrip}
+          className="mx-auto flex w-full max-w-5xl items-end gap-1 overflow-x-auto px-3 scrollbar-none md:px-6"
+          data-no-swipe
+        >
           <Link
             to="/profile"
             viewTransition
-            className="shrink-0 rounded-t-lg bg-leather px-3 py-2 text-xs font-semibold tracking-wide text-leather-foreground uppercase"
+            className="shrink-0 rounded-t-xl bg-leather px-3.5 py-2 text-[11px] font-bold tracking-wider text-leather-foreground uppercase active:opacity-80"
           >
             Profile
           </Link>
           <button
             type="button"
             onClick={() => setPicker(true)}
-            className="shrink-0 rounded-t-lg bg-secondary px-3 py-2 text-xs font-semibold tabular-nums"
+            className="shrink-0 rounded-t-xl bg-secondary px-3.5 py-2 text-xs font-bold tabular-nums active:opacity-80"
           >
             {d.getFullYear()}
           </button>
@@ -156,64 +178,58 @@ export function Component() {
                 aria-current={active}
                 onClick={() => goMonth(i)}
                 className={cn(
-                  "shrink-0 rounded-t-lg px-3 text-xs font-medium transition-all",
-                  active ? "bg-primary py-2.5 text-primary-foreground" : "bg-muted py-2 text-muted-foreground",
+                  "min-w-11 shrink-0 rounded-t-xl px-3 text-xs font-semibold transition-all md:flex-1",
+                  active ? "bg-primary py-2.5 text-primary-foreground" : "bg-muted py-2 text-muted-foreground active:bg-accent",
                 )}
               >
                 {m}
               </button>
             )
           })}
-          {!isToday && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="sticky right-0 mb-1 ml-auto shrink-0 bg-background shadow-sm"
-              onClick={() => flipTo(todayISO(), date)}
-            >
-              Today
-            </Button>
-          )}
+        </div>
+
+        {/* Section switcher lives in the fixed header so content never scrolls under it. */}
+        <div className="border-t bg-card/50 px-3 py-2 md:px-6">
+          <TabsList className="mx-auto grid max-w-xl grid-cols-4">
+            {SECTIONS.map(({ id, label, icon: Icon }) => (
+              <TabsTrigger key={id} value={id} className="gap-1 px-1 text-[13px]">
+                <Icon />
+                {label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
         </div>
       </header>
 
-      <main
-        ref={swipeRef}
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain [view-transition-name:page]"
-        style={{ backgroundColor: "var(--background)" }}
-      >
+      <main ref={swipeRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-background [view-transition-name:page]">
         {entry && (
-          <div className="grid gap-4 px-4 pt-4 pb-10">
+          <div className="mx-auto grid w-full max-w-5xl gap-4 px-4 pt-4 pb-12 md:px-6 md:pt-6">
             <HeaderBlock date={date} entry={entry} patch={patch} />
-            <Tabs value={section} onValueChange={(v) => setParams({ s: String(v) }, { replace: true })}>
-              <TabsList className="sticky top-0 z-10 grid w-full grid-cols-4 shadow-sm">
-                {SECTIONS.map(({ id, label, icon: Icon }) => (
-                  <TabsTrigger key={id} value={id} className="gap-1 text-[13px]">
-                    <Icon className="size-4" />
-                    {label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              <TabsContent value="health" className="grid gap-4 pt-2">
-                <HealthSection date={date} entry={entry} patch={patch} />
-              </TabsContent>
-              <TabsContent value="fitness" className="grid gap-4 pt-2">
-                <FitnessSection date={date} entry={entry} patch={patch} />
-              </TabsContent>
-              <TabsContent value="day" className="grid gap-4 pt-2">
-                <RoutineSection date={date} entry={entry} patch={patch} />
-              </TabsContent>
-              <TabsContent value="journal" className="grid gap-4 pt-2">
-                <JournalSection date={date} entry={entry} patch={patch} />
-              </TabsContent>
-            </Tabs>
-            <Button variant="ghost" className="justify-self-center text-muted-foreground" nativeButton={false} render={<Link to={`/export?from=${date}&to=${date}`} />}>
+            {/* Phones: one column of cards. Tablets: two-column card grid. */}
+            <TabsContent value="health" className="grid items-start gap-4 md:grid-cols-2">
+              <HealthSection date={date} entry={entry} patch={patch} />
+            </TabsContent>
+            <TabsContent value="fitness" className="grid items-start gap-4 md:grid-cols-2">
+              <FitnessSection date={date} entry={entry} patch={patch} />
+            </TabsContent>
+            <TabsContent value="day" className="grid items-start gap-4 md:grid-cols-2">
+              <RoutineSection date={date} entry={entry} patch={patch} />
+            </TabsContent>
+            <TabsContent value="journal" className="grid items-start gap-4 md:grid-cols-2">
+              <JournalSection date={date} entry={entry} patch={patch} />
+            </TabsContent>
+            <Button
+              variant="ghost"
+              className="justify-self-center text-muted-foreground"
+              nativeButton={false}
+              render={<Link to={`/export?from=${date}&to=${date}`} />}
+            >
               <Share /> Export this day
             </Button>
           </div>
         )}
       </main>
       <DatePickerDrawer open={picker} onOpenChange={setPicker} value={date} onPick={(t) => flipTo(t, date)} />
-    </>
+    </Tabs>
   )
 }

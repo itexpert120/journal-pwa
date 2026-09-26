@@ -87,7 +87,7 @@ export function PhotoGallery({
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-1.5">
+      <div className="grid grid-cols-3 gap-1.5 md:grid-cols-5">
         {photos.map((p) => (
           <Tile key={p.id} photo={p} onOpen={() => setOpenId(p.id)} />
         ))}
