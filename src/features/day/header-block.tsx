@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { toast } from "sonner"
-import { Cake, Heart, Loader2, LocateFixed, Quote } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
-import { NumberField, Field } from "@/components/fields"
+import { Cake, Heart, Loader2, LocateFixed } from "lucide-react"
+import { ActionRow, Cell, EditSheet, Group, NumberRow, Row, SelectRow } from "@/components/ios"
 import { db, ENERGY_LEVELS, MOODS } from "@/lib/db"
-import { monthDay, fromISO, todayISO } from "@/lib/date"
+import { fromISO, monthDay, todayISO } from "@/lib/date"
 import { quoteFor } from "@/lib/quotes"
 import { fetchWeather, weatherInfo, WEATHER_PRESETS } from "@/lib/weather"
 import { cn } from "@/lib/utils"
@@ -17,27 +15,90 @@ function Occasions({ date }: { date: string }) {
   if (!occ?.length) return null
   const year = fromISO(date).getFullYear()
   return (
-    <div className="grid gap-2">
+    <Group>
       {occ.map((o) => (
-        <div
+        <Row
           key={o.id}
-          className="flex items-center gap-3 rounded-2xl bg-primary px-4 py-3 text-primary-foreground"
-        >
-          {o.kind === "Birthday" ? <Cake className="size-6 shrink-0" /> : <Heart className="size-6 shrink-0" />}
-          <div className="min-w-0 leading-tight">
-            <p className="truncate font-semibold">{o.name}</p>
-            <p className="text-sm opacity-80">
-              {o.kind}
-              {o.year && year > o.year ? ` · ${year - o.year} years` : ""}
-            </p>
-          </div>
-        </div>
+          icon={o.kind === "Birthday" ? Cake : Heart}
+          color={o.kind === "Birthday" ? "orange" : "pink"}
+          label={o.name}
+          detail={`${o.kind}${o.year && year > o.year ? ` · ${year - o.year} years` : ""}`}
+          value="🎉"
+        />
       ))}
+    </Group>
+  )
+}
+
+function Mood({ entry, patch }: SectionProps) {
+  return (
+    <Cell className="pb-2">
+      <div role="radiogroup" aria-label="Mood" className="grid grid-cols-5">
+        {MOODS.map((m) => {
+          const on = entry.mood === m.value
+          return (
+            <button
+              key={m.value}
+              type="button"
+              role="radio"
+              aria-checked={on}
+              onClick={() => {
+                navigator.vibrate?.(8)
+                patch((e) => void (e.mood = on ? undefined : m.value))
+              }}
+              className="grid justify-items-center gap-1 py-1 active:scale-95"
+            >
+              <span
+                className={cn(
+                  "grid size-12 place-items-center rounded-full text-[28px] transition-all duration-200",
+                  on ? "scale-110 bg-primary/15 ring-2 ring-primary" : "bg-muted/60",
+                )}
+              >
+                {m.emoji}
+              </span>
+              <span className={cn("text-[11px] font-medium", on ? "text-primary" : "text-muted-foreground")}>{m.label}</span>
+            </button>
+          )
+        })}
+      </div>
+    </Cell>
+  )
+}
+
+/** Energy as a battery: five cells inside a battery outline, tinted by level. */
+function Energy({ entry, patch }: SectionProps) {
+  const lvl = entry.energy ?? 0
+  const tint = lvl <= 20 ? "bg-[#ff3b30]" : lvl <= 40 ? "bg-[#ff9500]" : "bg-[#34c759]"
+  return (
+    <div className="flex min-h-[52px] items-center gap-3 px-4">
+      <span className="text-[17px]">Energy</span>
+      <div className="flex flex-1 items-center justify-end">
+        <div role="radiogroup" aria-label="Energy" className="flex h-8 items-center rounded-[10px] border-2 border-muted-foreground/40 p-[3px]">
+          {ENERGY_LEVELS.map((l) => (
+            <button
+              key={l}
+              type="button"
+              role="radio"
+              aria-checked={entry.energy === l}
+              aria-label={`${l}%`}
+              onClick={() => {
+                navigator.vibrate?.(8)
+                patch((e) => void (e.energy = e.energy === l ? undefined : l))
+              }}
+              className="h-full w-7 px-[1.5px] first:pl-0 last:pr-0"
+            >
+              <span className={cn("block h-full rounded-[4px] transition-colors duration-200", lvl >= l ? tint : "bg-muted")} />
+            </button>
+          ))}
+        </div>
+        <span className="ml-px h-3 w-[3px] rounded-r-sm bg-muted-foreground/40" aria-hidden />
+        <span className="ml-2 w-11 text-right text-[15px] text-muted-foreground tabular-nums">{entry.energy ? `${entry.energy}%` : "—"}</span>
+      </div>
     </div>
   )
 }
 
-function WeatherChip({ date, entry, patch }: SectionProps) {
+function Weather({ date, entry, patch }: SectionProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const w = entry.weather
@@ -50,13 +111,13 @@ function WeatherChip({ date, entry, patch }: SectionProps) {
       const r = await fetchWeather()
       await patch((e) => void (e.weather = { ...r, manual: false }))
     } catch {
-      if (!silent) toast.error("Couldn't get weather. Check location permission.")
+      if (!silent) toast.error("Couldn't get the weather. Check location permission.")
     } finally {
       setLoading(false)
     }
   }
 
-  // Auto-fetch for today only if location was already granted — never prompt on page load.
+  // Auto-fetch for today only when location is already granted — never prompt on load.
   useEffect(() => {
     if (!isToday || w || !navigator.permissions) return
     navigator.permissions
@@ -67,155 +128,68 @@ function WeatherChip({ date, entry, patch }: SectionProps) {
       .catch(() => {})
   }, [isToday, date])
 
+  const presetFor = (code: number) => WEATHER_PRESETS.find((c) => weatherInfo(c).label === weatherInfo(code).label) ?? code
+
   return (
     <>
-      <button
-        type="button"
+      <Row
+        label="Weather"
+        value={
+          loading ? (
+            <Loader2 className="inline size-4 animate-spin" />
+          ) : w ? (
+            <span className="text-foreground">
+              {info!.icon} {w.temp}° <span className="text-muted-foreground">{info!.label}</span>
+            </span>
+          ) : (
+            "Add"
+          )
+        }
         onClick={() => setOpen(true)}
-        className="flex h-full min-h-16 w-16 flex-col items-center justify-center rounded-2xl bg-muted/70 transition-transform active:scale-95"
-        aria-label={w ? `Weather: ${info!.label}, ${w.temp}°` : "Add weather"}
-      >
-        {loading ? (
-          <Loader2 className="size-5 animate-spin" />
-        ) : w ? (
-          <>
-            <span className="text-2xl leading-none">{info!.icon}</span>
-            <span className="mt-1 text-sm font-medium tabular-nums">{w.temp}°</span>
-          </>
-        ) : (
-          <>
-            <span className="text-2xl leading-none opacity-40">🌤️</span>
-            <span className="mt-1 text-[11px] text-muted-foreground">Weather</span>
-          </>
+        chevron
+      />
+      <EditSheet open={open} onOpenChange={setOpen} title="Weather">
+        {isToday && (
+          <Group>
+            <ActionRow icon={loading ? Loader2 : LocateFixed} onClick={() => auto()}>
+              Use Current Location
+            </ActionRow>
+          </Group>
         )}
-      </button>
-      <Drawer open={open} onOpenChange={setOpen} showSwipeHandle>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle className="text-3xl">Weather</DrawerTitle>
-          </DrawerHeader>
-          <div className="grid gap-4 p-4">
-            {isToday && (
-              <Button variant="secondary" size="lg" onClick={() => auto()} disabled={loading}>
-                {loading ? <Loader2 className="animate-spin" /> : <LocateFixed />} Use my location
-              </Button>
-            )}
-            <Field label="Temperature" hint="°C">
-              <NumberField
-                value={w?.temp}
-                decimal
-                onCommit={(v) =>
-                  patch((e) => {
-                    if (v === undefined) return
-                    e.weather = { code: e.weather?.code ?? 0, temp: v, manual: true }
-                  })
-                }
-              />
-            </Field>
-            <Field label="Conditions" group>
-              <div className="grid grid-cols-4 gap-2">
-                {WEATHER_PRESETS.map((code) => {
-                  const i = weatherInfo(code)
-                  return (
-                    <button
-                      type="button"
-                      key={code}
-                      onClick={() => patch((e) => void (e.weather = { temp: e.weather?.temp ?? 20, code, manual: true }))}
-                      className={cn(
-                        "flex h-18 flex-col items-center justify-center gap-1 rounded-xl border text-[11px]",
-                        w && weatherInfo(w.code).label === i.label && "border-primary bg-primary/10",
-                      )}
-                    >
-                      <span className="text-2xl">{i.icon}</span>
-                      {i.label}
-                    </button>
-                  )
-                })}
-              </div>
-            </Field>
-            <Button size="lg" onClick={() => setOpen(false)}>
-              Done
-            </Button>
-          </div>
-        </DrawerContent>
-      </Drawer>
+        <Group footer="Fetched from Open-Meteo for today. Edit by hand any time.">
+          <NumberRow
+            label="Temperature"
+            unit="°C"
+            decimal
+            value={w?.temp}
+            onCommit={(v) => v !== undefined && patch((e) => void (e.weather = { code: e.weather?.code ?? 0, temp: v, manual: true }))}
+            placeholder="—"
+          />
+          <SelectRow
+            label="Conditions"
+            value={w ? String(presetFor(w.code)) : undefined}
+            options={WEATHER_PRESETS.map((c) => ({ value: String(c), label: `${weatherInfo(c).icon}  ${weatherInfo(c).label}` }))}
+            onChange={(v) => patch((e) => void (e.weather = { temp: e.weather?.temp ?? 20, code: Number(v), manual: true }))}
+            placeholder="Not Set"
+          />
+        </Group>
+      </EditSheet>
     </>
   )
 }
 
 export function HeaderBlock(props: SectionProps) {
-  const { date, entry, patch } = props
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <div className="md:col-span-2 empty:hidden">
-        <Occasions date={date} />
+    <div className="grid gap-5">
+      <p className="px-6 text-center font-serif text-[17px] leading-snug text-muted-foreground italic">“{quoteFor(props.date)}”</p>
+      <div className="empty:hidden">
+        <Occasions date={props.date} />
       </div>
-      <figure className="relative flex items-center rounded-3xl bg-accent px-5 py-4 text-accent-foreground">
-        <Quote className="absolute top-3 left-3 size-4 opacity-40" />
-        <blockquote className="pl-4 font-serif text-lg leading-snug italic md:text-xl">{quoteFor(date)}</blockquote>
-      </figure>
-
-      <div className="grid grid-cols-[1fr_auto] gap-3 rounded-3xl border bg-card p-3">
-        <div className="grid gap-3">
-          <div role="radiogroup" aria-label="Mood" className="flex justify-between">
-            {MOODS.map((m) => {
-              const on = entry.mood === m.value
-              return (
-                <button
-                  key={m.value}
-                  type="button"
-                  role="radio"
-                  aria-checked={on}
-                  aria-label={m.label}
-                  onClick={() => {
-                    navigator.vibrate?.(8)
-                    patch((e) => void (e.mood = on ? undefined : m.value))
-                  }}
-                  className={cn(
-                    "grid size-11 place-items-center rounded-full text-[1.6rem] transition-all",
-                    on ? "scale-110 bg-primary/15 ring-2 ring-primary" : entry.mood ? "opacity-40 grayscale-50" : "",
-                  )}
-                >
-                  {m.emoji}
-                </button>
-              )
-            })}
-          </div>
-          <div role="radiogroup" aria-label="Energy" className="flex items-center gap-1.5">
-            <span className="mr-1 text-lg" aria-hidden>
-              🔋
-            </span>
-            {ENERGY_LEVELS.map((lvl) => {
-              const filled = (entry.energy ?? 0) >= lvl
-              return (
-                <button
-                  key={lvl}
-                  type="button"
-                  role="radio"
-                  aria-checked={entry.energy === lvl}
-                  aria-label={`Energy ${lvl}%`}
-                  onClick={() => {
-                    navigator.vibrate?.(8)
-                    patch((e) => void (e.energy = e.energy === lvl ? undefined : lvl))
-                  }}
-                  className="flex h-11 flex-1 items-center"
-                >
-                  <span
-                    className={cn(
-                      "h-6 w-full rounded-md border transition-colors",
-                      filled ? "border-primary bg-primary" : "border-transparent bg-muted",
-                    )}
-                  />
-                </button>
-              )
-            })}
-            <span className="w-10 text-right text-xs text-muted-foreground tabular-nums">
-              {entry.energy ? `${entry.energy}%` : "—"}
-            </span>
-          </div>
-        </div>
-        <WeatherChip {...props} />
-      </div>
+      <Group header="How are you feeling?">
+        <Mood {...props} />
+        <Energy {...props} />
+        <Weather {...props} />
+      </Group>
     </div>
   )
 }

@@ -114,7 +114,7 @@ export function JournalSection({ date, entry, patch }: SectionProps) {
               ]}
             />
           </div>
-          <div className={cn("relative pt-2 pb-6", `paper-${paper}`)}>
+          <div className={cn("relative pb-8", `paper-${paper}`)}>
             <JournalText
               value={entry.journal.text}
               onCommit={(v) => patch((e) => void (e.journal.text = v))}
