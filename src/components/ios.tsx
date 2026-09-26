@@ -4,7 +4,7 @@
  */
 import { useState } from "react"
 import { Link } from "react-router"
-import { Check, ChevronRight, type LucideIcon } from "lucide-react"
+import { Check, ChevronRight, CircleMinus, CirclePlus, type LucideIcon } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import { useDraft } from "@/hooks/use-draft"
@@ -432,5 +432,62 @@ export function EmptyState({ icon: Icon, title, children }: { icon: LucideIcon; 
       <p className="text-xl font-semibold">{title}</p>
       {children && <div className="text-[15px] text-muted-foreground">{children}</div>}
     </div>
+  )
+}
+
+/**
+ * Inline editable list of short strings (allergies, conditions…):
+ * red minus to remove, green plus row to add — like iOS list editing.
+ */
+export function ListEditor({
+  items,
+  onChange,
+  placeholder,
+  tone,
+}: {
+  items: string[]
+  onChange: (items: string[]) => void
+  placeholder: string
+  tone?: "alert"
+}) {
+  const [draft, setDraft] = useState("")
+  const add = () => {
+    const t = draft.trim()
+    if (t && !items.includes(t)) onChange([...items, t])
+    setDraft("")
+  }
+  return (
+    <>
+      {items.map((it) => (
+        <div key={it} className="flex min-h-[52px] items-center gap-3 pr-4 pl-3">
+          <button
+            type="button"
+            aria-label={`Remove ${it}`}
+            onClick={() => onChange(items.filter((x) => x !== it))}
+            className="grid size-8 place-items-center active:scale-90"
+          >
+            <CircleMinus className="size-[22px] fill-destructive text-white" />
+          </button>
+          <span className={cn("flex-1 text-[17px]", tone === "alert" && "font-semibold text-alert")}>{it}</span>
+        </div>
+      ))}
+      <form
+        className="flex min-h-[52px] items-center gap-3 pl-3"
+        onSubmit={(e) => {
+          e.preventDefault()
+          add()
+        }}
+      >
+        <CirclePlus className="m-[5px] size-[22px] shrink-0 fill-success text-white" />
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={add}
+          placeholder={placeholder}
+          enterKeyHint="done"
+          className="min-w-0 flex-1 bg-transparent py-3 pr-4 text-[17px] outline-none placeholder:text-muted-foreground/60"
+        />
+      </form>
+    </>
   )
 }

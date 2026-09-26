@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react"
-import { Eye, EyeOff, ShieldCheck } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { EditSheet, FieldRow, Group } from "@/components/ios"
 import { openText, sealText, type Sealed } from "@/lib/crypto"
 import { getLockConfig, unlockWithBiometric } from "@/lib/lock"
 
-const mask = (s: string) => (s.length <= 4 ? "•".repeat(s.length) : `${"•".repeat(Math.min(8, s.length - 4))} ${s.slice(-4)}`)
+const mask = (s: string) => `•••• ${s.slice(-4)}`
 
 /**
- * Encrypted-at-rest ID number. Shown masked; revealing it asks for
- * Face ID / fingerprint again when biometric lock is set up.
+ * Encrypted-at-rest ID number as a list row. Masked by default; revealing
+ * asks for Face ID / fingerprint again when biometric lock is on.
  */
-export function SecretField({
+export function SecretRow({
   label,
   sealed,
   onSave,
@@ -22,6 +21,7 @@ export function SecretField({
   onSave: (s: Sealed | undefined) => void
 }) {
   const [plain, setPlain] = useState("")
+  const [draft, setDraft] = useState("")
   const [revealed, setRevealed] = useState(false)
   const [editing, setEditing] = useState(false)
 
@@ -36,55 +36,63 @@ export function SecretField({
       try {
         if (!(await unlockWithBiometric(cfg.credentialId))) return
       } catch {
-        toast.error("Verification cancelled")
-        return
+        return toast.error("Verification cancelled")
       }
     }
     setRevealed(true)
-    // Re-mask automatically so it doesn't stay on screen.
     setTimeout(() => setRevealed(false), 20_000)
   }
 
-  if (editing)
-    return (
-      <form
-        className="flex gap-2"
-        onSubmit={async (e) => {
-          e.preventDefault()
-          onSave(await sealText(plain.trim()))
-          setEditing(false)
-        }}
-      >
-        <Input
-          autoFocus
-          value={plain}
-          onChange={(e) => setPlain(e.target.value)}
-          aria-label={label}
-          autoComplete="off"
-          autoCorrect="off"
-          spellCheck={false}
-          enterKeyHint="done"
-        />
-        <Button type="submit">Save</Button>
-      </form>
-    )
-
   return (
-    <div className="flex items-center gap-2">
-      <button
-        type="button"
-        onClick={() => setEditing(true)}
-        className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-lg border px-3 text-left font-mono tabular-nums"
-        aria-label={`Edit ${label}`}
+    <>
+      <div className="flex min-h-[52px] items-center gap-2 pr-2 pl-4 text-[17px]">
+        <button
+          type="button"
+          className="flex min-w-0 flex-1 items-center gap-2 py-3 text-left active:opacity-60"
+          onClick={() => {
+            setDraft(plain)
+            setEditing(true)
+          }}
+        >
+          <span className="flex-1 truncate">{label}</span>
+          <span className="truncate font-mono text-[15px] text-muted-foreground tabular-nums">
+            {plain ? (revealed ? plain : mask(plain)) : "Not Set"}
+          </span>
+        </button>
+        {plain && (
+          <button
+            type="button"
+            aria-label={revealed ? "Hide" : "Reveal"}
+            onClick={reveal}
+            className="grid size-10 place-items-center rounded-full text-primary active:bg-muted"
+          >
+            {revealed ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+          </button>
+        )}
+      </div>
+      <EditSheet
+        open={editing}
+        onOpenChange={async (o) => {
+          if (!o) onSave(await sealText(draft.trim()))
+          setEditing(o)
+        }}
+      title={label}
       >
-        <ShieldCheck className="size-4 shrink-0 text-emerald-600" />
-        <span className="truncate">{plain ? (revealed ? plain : mask(plain)) : <span className="font-sans text-muted-foreground">Not set</span>}</span>
-      </button>
-      {plain && (
-        <Button variant="ghost" size="icon" aria-label={revealed ? "Hide" : "Reveal"} onClick={reveal}>
-          {revealed ? <EyeOff /> : <Eye />}
-        </Button>
-      )}
-    </div>
+        <Group footer="Encrypted on this device and shown masked.">
+          <FieldRow label="Number">
+            <input
+              autoFocus
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
+              enterKeyHint="done"
+              className="min-w-0 flex-1 bg-transparent py-3 text-right font-mono text-[17px] outline-none"
+            />
+          </FieldRow>
+        </Group>
+      </EditSheet>
+    </>
   )
 }
