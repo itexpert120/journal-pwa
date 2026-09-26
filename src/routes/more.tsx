@@ -11,7 +11,6 @@ import {
   GripVertical,
   ListChecks,
   Lock,
-  Palette,
   Ruler,
   Share,
   Smartphone,
@@ -25,7 +24,6 @@ import { Field, NumberField, TextField } from "@/components/fields"
 import { AddButton, RemoveButton, Section } from "@/components/section"
 import { uid } from "@/lib/id"
 import { updateSettings, useSettings, type Settings } from "@/lib/profile"
-import { setTheme, useTheme, type Theme } from "@/lib/theme"
 import { notificationsSupported, requestNotifications, runDueReminders } from "@/lib/notify"
 import { isIOS, isStandalone, promptInstall, useCanPromptInstall } from "@/lib/install"
 
@@ -184,7 +182,6 @@ function Reminders({ s }: { s: Settings }) {
 
 export function Component() {
   const s = useSettings()
-  const theme = useTheme()
 
   useEffect(() => {
     if (s && location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: "start" })
@@ -228,19 +225,6 @@ export function Component() {
         </div>
 
         <Reminders s={s} />
-
-        <Section title="Appearance" icon={Palette}>
-          <Seg<Theme>
-            label="Theme"
-            value={theme}
-            onChange={setTheme}
-            options={[
-              ["system", "Auto"],
-              ["light", "Light"],
-              ["dark", "Dark"],
-            ]}
-          />
-        </Section>
 
         <Section title="Units" icon={Ruler}>
           <Field label="Weight" group>

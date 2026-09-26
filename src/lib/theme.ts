@@ -1,51 +1,22 @@
 import { useSyncExternalStore } from "react"
 
-export type Theme = "system" | "light" | "dark"
+/** The app always follows the system light/dark setting — there's no in-app override. */
 const mq = matchMedia("(prefers-color-scheme: dark)")
-const listeners = new Set<() => void>()
-
-const read = (): Theme => {
-  try {
-    return (localStorage.getItem("theme") as Theme) || "system"
-  } catch {
-    return "system"
-  }
-}
-const isDark = (t: Theme) => t === "dark" || (t === "system" && mq.matches)
 
 function apply() {
-  const dark = isDark(read())
-  document.documentElement.classList.toggle("dark", dark)
-  document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
-    m.setAttribute("content", dark ? "#1c1814" : "#f7f2e9")
-    m.removeAttribute("media")
-  })
-  listeners.forEach((l) => l())
+  document.documentElement.classList.toggle("dark", mq.matches)
 }
-mq.addEventListener("change", apply)
 
-export function setTheme(t: Theme) {
-  try {
-    localStorage.setItem("theme", t)
-  } catch {
-    /* private mode */
-  }
+export function initTheme() {
   apply()
+  mq.addEventListener("change", apply)
 }
-export const initTheme = apply
-export const useTheme = () =>
-  useSyncExternalStore(
-    (l) => {
-      listeners.add(l)
-      return () => listeners.delete(l)
-    },
-    read,
-  )
+
 export const useResolvedDark = () =>
   useSyncExternalStore(
     (l) => {
-      listeners.add(l)
-      return () => listeners.delete(l)
+      mq.addEventListener("change", l)
+      return () => mq.removeEventListener("change", l)
     },
-    () => isDark(read()),
+    () => mq.matches,
   )
