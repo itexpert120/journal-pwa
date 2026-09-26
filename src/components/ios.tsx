@@ -4,8 +4,9 @@
  */
 import { useState } from "react"
 import { Link } from "react-router"
-import { Check, ChevronRight, CircleMinus, CirclePlus, type LucideIcon } from "lucide-react"
+import { Check, ChevronRight, CircleMinus, CirclePlus, Minus, Plus, type LucideIcon } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import { useDraft } from "@/hooks/use-draft"
 import { cn } from "@/lib/utils"
@@ -491,4 +492,95 @@ export function ListEditor({
       </form>
     </>
   )
+}
+
+/** Checklist row with a round check (Reminders style). */
+export function CheckRow({
+  checked,
+  onChange,
+  label,
+  detail,
+  trailing,
+}: {
+  checked: boolean
+  onChange: (c: boolean) => void
+  label: React.ReactNode
+  detail?: React.ReactNode
+  trailing?: React.ReactNode
+}) {
+  return (
+    <label className={cn(rowBase, "cursor-pointer active:bg-muted")}>
+      <Checkbox
+        checked={checked}
+        onCheckedChange={(c) => {
+          navigator.vibrate?.(8)
+          onChange(!!c)
+        }}
+      />
+      <span className="min-w-0 flex-1 py-2.5">
+        <span className={cn("block transition-colors", checked && "text-muted-foreground line-through decoration-muted-foreground/50")}>{label}</span>
+        {detail && <span className="block text-[13px] text-muted-foreground">{detail}</span>}
+      </span>
+      {trailing}
+    </label>
+  )
+}
+
+/** iOS stepper: − | + capsule. */
+export function Stepper({ onDecrement, onIncrement, label }: { onDecrement: () => void; onIncrement: () => void; label: string }) {
+  const btn = "grid h-8 w-12 place-items-center text-foreground active:bg-foreground/10"
+  return (
+    <div className="flex items-center overflow-hidden rounded-full bg-muted" role="group" aria-label={label}>
+      <button type="button" aria-label={`Decrease ${label}`} className={btn} onClick={onDecrement}>
+        <Minus className="size-5" />
+      </button>
+      <span className="h-4 w-px bg-border" />
+      <button type="button" aria-label={`Increase ${label}`} className={btn} onClick={onIncrement}>
+        <Plus className="size-5" />
+      </button>
+    </div>
+  )
+}
+
+/** SwiftUI `.pickerStyle(.segmented)` — capsule track, capsule thumb. */
+export function Segmented<T extends string | number>({
+  value,
+  options,
+  onChange,
+  label,
+  className,
+}: {
+  value: T | undefined
+  options: readonly { value: T; label: React.ReactNode }[]
+  onChange: (v: T) => void
+  label: string
+  className?: string
+}) {
+  return (
+    <div role="radiogroup" aria-label={label} className={cn("flex h-9 rounded-full bg-muted p-[3px]", className)}>
+      {options.map((o) => (
+        <button
+          key={String(o.value)}
+          type="button"
+          role="radio"
+          aria-checked={o.value === value}
+          onClick={() => {
+            navigator.vibrate?.(6)
+            onChange(o.value)
+          }}
+          className={cn(
+            "flex-1 rounded-full px-2 text-[13px] font-semibold transition-[background-color,box-shadow] duration-200",
+            o.value === value && "bg-card shadow-[0_2px_6px_rgb(0_0_0/0.12)] dark:bg-[#636366]",
+          )}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+/** Section wrapper row for arbitrary content with standard insets. */
+export function Cell({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <div className={cn("px-4 py-3", className)}>{children}</div>
 }
