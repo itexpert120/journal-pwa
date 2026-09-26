@@ -42,7 +42,21 @@ const fade: Variants = {
 }
 
 /** Elements that own horizontal gestures themselves. */
-const NO_DRAG = "[data-no-swipe],input,textarea,select,canvas,audio,[role=slider],[role=radiogroup]"
+const NO_DRAG =
+  "[data-no-swipe],input,textarea,select,canvas,audio,[contenteditable=true],[role=slider],[role=switch],[role=radiogroup],[role=tablist]"
+
+// Last time anything scrolled. A finger that lands to stop a momentum scroll
+// must not also grab the page.
+let lastScroll = 0
+if (typeof document !== "undefined")
+  document.addEventListener("scroll", () => (lastScroll = performance.now()), { capture: true, passive: true })
+
+/** True when the touch landed inside something that scrolls sideways. */
+function inHorizontalScroller(el: HTMLElement, stop: HTMLElement) {
+  for (let n: HTMLElement | null = el; n && n !== stop; n = n.parentElement)
+    if (n.scrollWidth > n.clientWidth + 1 && /auto|scroll/.test(getComputedStyle(n).overflowX)) return true
+  return false
+}
 
 function Leaf({ children, onTurn }: { children: React.ReactNode; onTurn: (dir: 1 | -1) => void }) {
   const controls = useDragControls()
@@ -58,12 +72,31 @@ function Leaf({ children, onTurn }: { children: React.ReactNode; onTurn: (dir: 1
       dragMomentum={false}
       onPointerDown={(e) => {
         const t = e.target as HTMLElement
-        // Leave the screen's left edge to the OS back gesture.
-        if (e.clientX < 20 || t.closest(NO_DRAG)) return
+        if (
+          !e.isPrimary ||
+          // Sheets/popovers are portalled out of the DOM but React still bubbles
+          // their events here; only real touches on the page count.
+          !e.currentTarget.contains(t) ||
+          // Leave the screen edges to the OS back/forward gestures.
+          e.clientX < 24 ||
+          e.clientX > window.innerWidth - 24 ||
+          t.closest(NO_DRAG) ||
+          inHorizontalScroller(t, e.currentTarget) ||
+          // Typing: a stray swipe shouldn't carry the page (and keyboard) away.
+          document.documentElement.hasAttribute("data-keyboard") ||
+          performance.now() - lastScroll < 150
+        )
+          return
         controls.start(e)
       }}
-      onDragEnd={(_, info) => {
-        const dir = info.offset.x < -70 || info.velocity.x < -450 ? 1 : info.offset.x > 70 || info.velocity.x > 450 ? -1 : 0
+      onDragEnd={(_, { offset, velocity }) => {
+        const ax = Math.abs(offset.x)
+        // Must be a deliberate sideways gesture: well past a nudge, and clearly
+        // more horizontal than vertical (a slanted scroll flick won't turn).
+        const horizontal = ax > Math.abs(offset.y) * 2 && Math.abs(velocity.x) > Math.abs(velocity.y)
+        const far = ax > 110
+        const flick = ax > 50 && Math.abs(velocity.x) > 700
+        const dir = horizontal && (far || flick) ? (offset.x < 0 ? 1 : -1) : 0
         if (dir) onTurn(dir)
         // Cancelled (or turning back): settle this page flat. A forward turn keeps
         // its lift so the exit continues from where the finger left it.

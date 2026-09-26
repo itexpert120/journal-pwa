@@ -73,7 +73,7 @@ export function Component() {
   }
 
   // Horizontal swipe on the grid changes month.
-  const touch = useRef({ x: 0, y: 0 })
+  const touch = useRef<{ x: number; y: number } | null>(null)
 
   return (
     <Page
@@ -122,11 +122,17 @@ export function Component() {
             </button>
           </div>
           <div
-            onTouchStart={(e) => (touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
+            onTouchStart={(e) => {
+              const t = e.touches[0]
+              // Ignore pinches and edge swipes (OS back/forward).
+              touch.current = e.touches.length > 1 || t.clientX < 24 || t.clientX > window.innerWidth - 24 ? null : { x: t.clientX, y: t.clientY }
+            }}
+            onTouchMove={(e) => e.touches.length > 1 && (touch.current = null)}
             onTouchEnd={(e) => {
+              if (!touch.current) return
               const dx = e.changedTouches[0].clientX - touch.current.x
               const dy = e.changedTouches[0].clientY - touch.current.y
-              if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) setMonth((m) => addMonths(m, dx < 0 ? 1 : -1))
+              if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 2) setMonth((m) => addMonths(m, dx < 0 ? 1 : -1))
             }}
           >
             <MonthGrid
