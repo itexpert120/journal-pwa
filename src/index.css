@@ -303,6 +303,18 @@ html[data-flip] .vt-page { view-transition-name: page; }
 ::view-transition-new(root) {
   animation: none;
 }
+/*
+ * Keep the tab bar above the sliding screen during push/pop. The name is only
+ * applied mid-transition because a view-transition-name makes the element a
+ * backdrop root (its blur would stop seeing the page) — so we also give the
+ * glass a denser fill for those few hundred ms.
+ */
+html[data-nav] .tabbar {
+  view-transition-name: tabbar;
+}
+html[data-nav] .tabbar .glass {
+  background-color: color-mix(in srgb, var(--card) 94%, transparent);
+}
 ::view-transition-group(screen) {
   animation-duration: 440ms;
 }

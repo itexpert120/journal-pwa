@@ -63,6 +63,18 @@ if (isDesktop() && !import.meta.env.DEV) {
       </StrictMode>,
     ),
   )
+  // Warm every screen's chunk once idle so tab switches never wait on the network.
+  const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1500))
+  idle(() => {
+    for (const load of [
+      () => import("./routes/calendar"),
+      () => import("./routes/search"),
+      () => import("./routes/profile"),
+      () => import("./routes/more"),
+      () => import("./routes/emergency"),
+    ])
+      load()
+  })
   if (import.meta.env.PROD && "serviceWorker" in navigator) {
     import("virtual:pwa-register").then(({ registerSW }) => registerSW({ immediate: true }))
   }

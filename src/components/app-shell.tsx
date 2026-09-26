@@ -22,12 +22,8 @@ function TabItem({ to, label, icon: Icon, rail }: { to: string; label: string; i
   return (
     <NavLink
       to={to === "/day" ? `/day/${todayISO()}` : to}
-      viewTransition
       aria-current={active ? "page" : undefined}
-      onClick={() => {
-        setNav("tab")
-        navigator.vibrate?.(6)
-      }}
+      onClick={() => navigator.vibrate?.(6)}
       className={cn(
         "flex flex-col items-center justify-center gap-px rounded-full text-[10px] font-medium transition-[background-color,color,transform] duration-300 active:scale-[0.92]",
         rail ? "size-16 rounded-[1.25rem]" : "h-[54px] flex-1",
@@ -50,7 +46,7 @@ export function AppShell() {
   const searchActive = pathname.startsWith("/search")
   return (
     <div className="relative flex h-dvh overflow-hidden bg-background">
-      <nav aria-label="Primary" className="no-print z-30 hidden p-3 pl-[max(env(safe-area-inset-left),12px)] md:flex">
+      <nav aria-label="Primary" className="tabbar no-print z-30 hidden p-3 pl-[max(env(safe-area-inset-left),12px)] md:flex">
         <div className="glass flex w-20 flex-col items-center gap-1.5 rounded-[1.75rem] py-3">
           {TABS.map((t) => (
             <TabItem key={t.to} {...t} rail />
@@ -67,7 +63,7 @@ export function AppShell() {
       <div aria-hidden className="edge-bottom pointer-events-none absolute inset-x-0 bottom-0 z-20 h-32 md:hidden" />
       <nav
         aria-label="Primary"
-        className="no-print pointer-events-none absolute inset-x-0 bottom-0 z-30 flex items-center gap-3 px-[21px] pb-[max(calc(env(safe-area-inset-bottom)-6px),16px)] md:hidden"
+        className="tabbar no-print pointer-events-none absolute inset-x-0 bottom-0 z-30 flex items-center gap-3 px-[21px] pb-[max(calc(env(safe-area-inset-bottom)-6px),16px)] md:hidden"
       >
         <div className="glass pointer-events-auto flex min-w-0 flex-1 items-center rounded-full p-1">
           {TABS.map((t) => (
@@ -76,10 +72,9 @@ export function AppShell() {
         </div>
         <NavLink
           to="/search"
-          viewTransition
           aria-label="Search"
           aria-current={searchActive ? "page" : undefined}
-          onClick={() => setNav("tab")}
+          onClick={() => navigator.vibrate?.(6)}
           className={cn(
             "glass pointer-events-auto grid size-[62px] shrink-0 place-items-center rounded-full transition-transform active:scale-[0.92]",
             searchActive ? "text-primary" : "text-foreground",
