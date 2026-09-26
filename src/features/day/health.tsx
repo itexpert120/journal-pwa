@@ -15,12 +15,18 @@ import { kgTo, toKg } from "@/lib/units"
 import { cn } from "@/lib/utils"
 import type { SectionProps } from "./types"
 
+/**
+ * ESC/ESH office BP categories; the higher of systolic/diastolic decides.
+ * Optimal <120/<80 · Normal 120–129/80–84 · High-normal 130–139/85–89 · High ≥140/≥90.
+ */
 function bpClass(sys?: number, dia?: number) {
   if (!sys || !dia) return undefined
+  const good = "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
   if (sys >= 140 || dia >= 90) return { label: "High", cls: "bg-alert/15 text-alert" }
-  if (sys >= 130 || dia >= 80) return { label: "Elevated", cls: "bg-amber-500/15 text-amber-700 dark:text-amber-300" }
+  if (sys >= 130 || dia >= 85) return { label: "High-normal", cls: "bg-amber-500/15 text-amber-700 dark:text-amber-300" }
   if (sys < 90 || dia < 60) return { label: "Low", cls: "bg-sky-500/15 text-sky-700 dark:text-sky-300" }
-  return { label: "Normal", cls: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" }
+  if (sys >= 120 || dia >= 80) return { label: "Normal", cls: good }
+  return { label: "Optimal", cls: good }
 }
 
 export function TimeInput({ value, onChange, label = "Time" }: { value?: string; onChange: (v: string) => void; label?: string }) {
