@@ -1,7 +1,6 @@
 import { useRef } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { FileText, Paperclip, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { db, saveFile } from "@/lib/db"
 import { compressImage } from "@/lib/image"
 import { useFileUrl } from "@/hooks/use-file-url"
@@ -17,7 +16,7 @@ function Thumb({ id, onRemove }: { id: string; onRemove: () => void }) {
         href={url}
         target="_blank"
         rel="noreferrer"
-        className="grid size-full place-items-center overflow-hidden rounded-lg border bg-muted"
+        className="grid size-full place-items-center overflow-hidden rounded-xl bg-muted"
       >
         {isImage && url ? (
           <img src={url} alt={file?.name ?? "Attachment"} className="size-full object-cover" />
@@ -32,7 +31,7 @@ function Thumb({ id, onRemove }: { id: string; onRemove: () => void }) {
         type="button"
         aria-label="Remove attachment"
         onClick={onRemove}
-        className="absolute -top-2 -right-2 grid size-7 place-items-center rounded-full border bg-background shadow-sm"
+        className="absolute -top-2 -right-2 grid size-7 place-items-center rounded-full bg-foreground text-background shadow-sm"
       >
         <X className="size-3.5" />
       </button>
@@ -69,14 +68,14 @@ export function Attachments({
       {ids.map((id) => (
         <Thumb key={id} id={id} onRemove={() => remove(id)} />
       ))}
-      <Button
-        variant="outline"
-        className="size-20 shrink-0 flex-col gap-1 border-dashed text-xs text-muted-foreground"
+      <button
+        type="button"
+        className="flex size-20 shrink-0 flex-col items-center justify-center gap-1 rounded-xl bg-muted text-[13px] font-medium text-primary active:opacity-70"
         onClick={() => input.current?.click()}
       >
         <Paperclip className="size-5" />
         {label}
-      </Button>
+      </button>
       <input
         ref={input}
         type="file"

@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react"
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router"
 import { format, getDaysInMonth } from "date-fns"
 import { ChevronLeft, ChevronRight, Dumbbell, HeartPulse, ListChecks, NotebookPen, Share } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DatePickerDrawer } from "@/components/date-picker-drawer"
 import { useEntry, prefetchEntry } from "@/hooks/use-entry"
@@ -185,14 +184,14 @@ function DayPage({ date }: { date: ISODate }) {
             <TabsContent value="journal" className="grid items-start gap-4 md:grid-cols-2">
               <JournalSection date={date} entry={entry} patch={patch} />
             </TabsContent>
-            <Button
-              variant="ghost"
-              className="justify-self-center text-muted-foreground"
-              nativeButton={false}
-              render={<Link to={`/export?from=${date}&to=${date}`} />}
+            <Link
+              to={`/export?from=${date}&to=${date}`}
+              viewTransition
+              onClick={() => setNav("push")}
+              className="flex h-11 items-center gap-2 justify-self-center rounded-full px-4 text-[15px] font-medium text-primary active:bg-muted"
             >
-              <Share /> Export this day
-            </Button>
+              <Share className="size-4" /> Export This Day
+            </Link>
           </div>
           </PageTurner>
         )}
