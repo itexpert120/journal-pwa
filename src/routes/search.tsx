@@ -2,12 +2,10 @@ import { useDeferredValue, useState } from "react"
 import { Link, useSearchParams } from "react-router"
 import { useLiveQuery } from "dexie-react-hooks"
 import { format } from "date-fns"
-import { Search as SearchIcon, SlidersHorizontal, X } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Page } from "@/components/app-shell"
-import { Field } from "@/components/fields"
+import { ChevronRight, Search as SearchIcon, SlidersHorizontal, X } from "lucide-react"
+import { BarButton, Page } from "@/components/app-shell"
+import { ActionRow, DateTimeRow, EmptyState, Group } from "@/components/ios"
+import { setNav } from "@/lib/nav"
 import { db, type Entry } from "@/lib/db"
 import { fromISO } from "@/lib/date"
 import { cn } from "@/lib/utils"
@@ -98,111 +96,104 @@ export function Component() {
     return res
   }, [dq, kind, from, to])
 
+  const clearDates = () =>
+    setParams((p) => {
+      p.delete("from")
+      p.delete("to")
+      return p
+    })
+
   return (
     <Page
-      bar={
-        <header className="glass-bar sticky top-0 z-20 pt-safe">
-          <div className="mx-auto flex max-w-3xl items-center gap-2 p-3 md:px-8">
-            <div className="relative flex-1">
-              <SearchIcon className="pointer-events-none absolute top-3 left-3 size-5 text-muted-foreground" />
-              <Input
-                type="search"
-                value={q}
-                onChange={(e) => set("q", e.target.value)}
-                placeholder="Search text or #tag"
-                className="rounded-full pl-10"
-                enterKeyHint="search"
-                autoCapitalize="none"
-                aria-label="Search"
-              />
-            </div>
-            <Button
-              variant={showFilters ? "secondary" : "ghost"}
-              size="icon"
-              aria-label="Filters"
-              aria-expanded={showFilters}
-              onClick={() => setShowFilters((s) => !s)}
-            >
-              <SlidersHorizontal />
-            </Button>
-          </div>
-          <div className="mx-auto flex max-w-3xl gap-1.5 overflow-x-auto px-3 pb-3 scrollbar-none md:px-8">
-            {KINDS.map((k) => (
-              <button
-                key={k}
-                type="button"
-                onClick={() => set("k", k === "all" ? "" : k)}
-                className={cn(
-                  "h-9 shrink-0 rounded-full px-4 text-sm font-semibold capitalize transition-colors",
-                  kind === k ? "bg-primary text-primary-foreground" : "bg-muted text-foreground/80",
-                )}
-              >
-                {k}
-              </button>
-            ))}
-          </div>
-          {showFilters && (
-            <div className="mx-auto grid max-w-3xl grid-cols-[1fr_1fr_auto] items-end gap-2 px-3 pb-3 md:px-8">
-              <Field label="From">
-                <Input type="date" value={from} onChange={(e) => set("from", e.target.value)} />
-              </Field>
-              <Field label="To">
-                <Input type="date" value={to} onChange={(e) => set("to", e.target.value)} />
-              </Field>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Clear dates"
-                onClick={() =>
-                  setParams((p) => {
-                    p.delete("from")
-                    p.delete("to")
-                    return p
-                  })
-                }
-              >
-                <X />
-              </Button>
-            </div>
-          )}
-        </header>
+      title="Search"
+      actions={
+        <BarButton label="Date filter" onClick={() => setShowFilters((v) => !v)} className={cn(showFilters && "text-primary")}>
+          <SlidersHorizontal />
+        </BarButton>
       }
     >
-      {hits === undefined ? null : hits.length === 0 ? (
-        <div className="grid place-items-center gap-3 pt-16 text-center text-muted-foreground">
-          <SearchIcon className="size-10 opacity-40" />
-          <p>{q || from || to || kind !== "all" ? "Nothing found." : "Search your journal, medical logs and #tags."}</p>
-          {!q && (
-            <div className="flex flex-wrap justify-center gap-2">
-              {["#health", "#family", "#travel", "#birthday"].map((t) => (
-                <Button key={t} variant="outline" size="sm" onClick={() => set("q", t)}>
-                  {t}
-                </Button>
-              ))}
-            </div>
+      <div className="grid gap-4">
+        {/* Search field + scope chips */}
+        <div className="flex h-11 items-center gap-2 rounded-full bg-muted px-3.5">
+          <SearchIcon className="size-5 shrink-0 text-muted-foreground" />
+          <input
+            type="search"
+            value={q}
+            onChange={(e) => set("q", e.target.value)}
+            placeholder="Journal, medical logs, #tags"
+            enterKeyHint="search"
+            autoCapitalize="none"
+            aria-label="Search"
+            className="min-w-0 flex-1 bg-transparent text-[17px] outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
+          />
+          {q && (
+            <button type="button" aria-label="Clear" onClick={() => set("q", "")} className="grid size-6 place-items-center rounded-full bg-muted-foreground/40 text-background">
+              <X className="size-3.5" strokeWidth={3} />
+            </button>
           )}
         </div>
-      ) : (
-        <ul className="grid gap-2">
-          {hits.map((h, i) => (
-            <li key={i}>
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 scrollbar-none">
+          {KINDS.map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => set("k", k === "all" ? "" : k)}
+              className={cn(
+                "h-9 shrink-0 rounded-full px-4 text-[15px] font-medium capitalize transition-colors active:scale-95",
+                kind === k ? "bg-foreground text-background" : "bg-card text-foreground",
+              )}
+            >
+              {k}
+            </button>
+          ))}
+        </div>
+        {showFilters && (
+          <Group>
+            <DateTimeRow label="From" type="date" value={from} onChange={(v) => set("from", v)} />
+            <DateTimeRow label="To" type="date" value={to} onChange={(v) => set("to", v)} />
+            {(from || to) && (
+              <ActionRow destructive onClick={clearDates}>
+                Clear Dates
+              </ActionRow>
+            )}
+          </Group>
+        )}
+
+        {hits === undefined ? null : hits.length === 0 ? (
+          <EmptyState icon={SearchIcon} title={q || from || to || kind !== "all" ? "No Results" : "Search Your Journal"}>
+            {q || from || to || kind !== "all" ? (
+              <p>Try a different word or filter.</p>
+            ) : (
+              <div className="mt-2 flex flex-wrap justify-center gap-2">
+                {["#health", "#family", "#travel", "#birthday"].map((t) => (
+                  <button key={t} type="button" onClick={() => set("q", t)} className="h-9 rounded-full bg-card px-4 text-[15px] text-primary active:scale-95">
+                    {t}
+                  </button>
+                ))}
+              </div>
+            )}
+          </EmptyState>
+        ) : (
+          <Group header={`${hits.length}${hits.length === 200 ? "+" : ""} results`}>
+            {hits.map((h, i) => (
               <Link
+                key={i}
                 to={`/day/${h.date}?s=${SECTION[h.kind]}`}
                 viewTransition
-                className="grid gap-1 rounded-xl border bg-card p-3 active:bg-muted"
+                onClick={() => setNav("push")}
+                className="grid gap-0.5 px-4 py-3 active:bg-muted"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold">{format(fromISO(h.date), "EEE d MMM yyyy")}</span>
-                  <Badge variant="secondary" className="ml-auto capitalize">
-                    {h.kind}
-                  </Badge>
+                  <span className="text-[15px] font-semibold">{format(fromISO(h.date), "EEE d MMM yyyy")}</span>
+                  <span className="ml-auto text-[13px] text-muted-foreground capitalize">{h.kind}</span>
+                  <ChevronRight className="size-4 text-muted-foreground/60" />
                 </div>
-                <p className="line-clamp-3 text-sm text-muted-foreground">{highlight(h.text, q.startsWith("#") ? "" : q.trim())}</p>
+                <p className="line-clamp-2 text-[15px] text-muted-foreground">{highlight(h.text, q.startsWith("#") ? "" : q.trim())}</p>
               </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+            ))}
+          </Group>
+        )}
+      </div>
     </Page>
   )
 }

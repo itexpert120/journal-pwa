@@ -9,6 +9,7 @@ import { DatePickerDrawer } from "@/components/date-picker-drawer"
 import { useEntry, prefetchEntry } from "@/hooks/use-entry"
 import { BarButton, TAB_BAR_SPACE } from "@/components/app-shell"
 import { setNav } from "@/lib/nav"
+import { ScrollFade } from "@/components/scroll-fade"
 import { useScrolled } from "@/hooks/use-scrolled"
 import { fromISO, isISODate, shiftISO, toISO, todayISO, type ISODate } from "@/lib/date"
 import { cn } from "@/lib/utils"
@@ -159,7 +160,8 @@ function DayPage({ date }: { date: ISODate }) {
 
         {/* Binder dividers: permanent Profile tab, year, then months — one glass capsule. */}
         <div className="mx-auto w-full max-w-5xl px-4 pt-1 md:px-6" data-no-swipe>
-          <div ref={monthStrip} className="glass flex items-center gap-0.5 overflow-x-auto rounded-full p-1 scrollbar-none">
+          <div className="glass rounded-full p-1">
+          <ScrollFade scrollRef={monthStrip} className="flex items-center gap-0.5 rounded-full">
             <Link
               to="/profile"
               viewTransition
@@ -192,6 +194,7 @@ function DayPage({ date }: { date: ISODate }) {
                 </button>
               )
             })}
+          </ScrollFade>
           </div>
         </div>
 

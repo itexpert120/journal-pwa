@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { format } from "date-fns"
 import { Cake, Heart, Plus } from "lucide-react"
-import { Page } from "@/components/app-shell"
+import { BarButton, Page } from "@/components/app-shell"
 import { DateTimeRow, EditSheet, EmptyState, Group, Row, SelectRow, TextRow } from "@/components/ios"
 import { Button } from "@/components/ui/button"
 import { db, type Occasion } from "@/lib/db"
@@ -64,9 +64,9 @@ export function Component() {
       back="/more"
       backLabel="Settings"
       actions={
-        <Button variant="ghost" size="icon" aria-label="Add occasion" className="text-primary" onClick={add}>
-          <Plus className="size-6" />
-        </Button>
+        <BarButton label="Add occasion" onClick={add}>
+          <Plus strokeWidth={2.4} />
+        </BarButton>
       }
     >
       {list && sorted.length === 0 ? (
