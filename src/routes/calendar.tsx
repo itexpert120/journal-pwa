@@ -57,7 +57,7 @@ export function Component() {
           <Button variant="ghost" size="icon" aria-label="Previous month" onClick={() => setMonth((m) => addMonths(m, -1))}>
             <ChevronLeft />
           </Button>
-          <button type="button" className="flex-1 rounded-lg py-1 font-heading text-3xl active:bg-muted" onClick={() => setPicker(true)}>
+          <button type="button" className="flex-1 rounded-full py-1 text-xl font-bold tracking-tight active:bg-muted" onClick={() => setPicker(true)}>
             {format(month, "MMMM yyyy")}
           </button>
           <Button variant="ghost" size="icon" aria-label="Next month" onClick={() => setMonth((m) => addMonths(m, 1))}>

@@ -179,7 +179,7 @@ export function JournalSection({ date, entry, patch }: SectionProps) {
             placeholder={mode === "type" ? "Dear diary…" : ""}
             readOnly={mode === "write"}
             aria-label="Journal text"
-            className="min-h-[60dvh] resize-none rounded-none border-0 bg-transparent px-5 pt-2 font-heading text-[1.3rem] leading-8 shadow-none focus-visible:ring-0 dark:bg-transparent"
+            className="min-h-[60dvh] resize-none rounded-none border-0 bg-transparent px-5 pt-2 font-serif text-[1.2rem] leading-8 shadow-none focus-visible:ring-0 dark:bg-transparent"
           />
           <DrawingCanvas
             className="absolute inset-0 size-full"

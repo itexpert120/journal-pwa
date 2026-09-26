@@ -21,7 +21,7 @@ function Occasions({ date }: { date: string }) {
       {occ.map((o) => (
         <div
           key={o.id}
-          className="flex items-center gap-3 rounded-2xl bg-linear-to-r from-amber-200 to-rose-200 px-4 py-3 text-amber-950 dark:from-amber-900/60 dark:to-rose-900/60 dark:text-amber-50"
+          className="flex items-center gap-3 rounded-2xl bg-primary px-4 py-3 text-primary-foreground"
         >
           {o.kind === "Birthday" ? <Cake className="size-6 shrink-0" /> : <Heart className="size-6 shrink-0" />}
           <div className="min-w-0 leading-tight">
@@ -150,9 +150,9 @@ export function HeaderBlock(props: SectionProps) {
       <div className="md:col-span-2 empty:hidden">
         <Occasions date={date} />
       </div>
-      <figure className="relative flex items-center rounded-3xl bg-leather px-5 py-4 text-leather-foreground">
+      <figure className="relative flex items-center rounded-3xl bg-accent px-5 py-4 text-accent-foreground">
         <Quote className="absolute top-3 left-3 size-4 opacity-40" />
-        <blockquote className="pl-4 font-heading text-xl leading-snug italic md:text-2xl">{quoteFor(date)}</blockquote>
+        <blockquote className="pl-4 font-serif text-lg leading-snug italic md:text-xl">{quoteFor(date)}</blockquote>
       </figure>
 
       <div className="grid grid-cols-[1fr_auto] gap-3 rounded-3xl border bg-card p-3">
@@ -203,11 +203,7 @@ export function HeaderBlock(props: SectionProps) {
                   <span
                     className={cn(
                       "h-6 w-full rounded-md border transition-colors",
-                      filled
-                        ? (entry.energy ?? 0) <= 40
-                          ? "border-amber-500 bg-amber-400"
-                          : "border-emerald-600 bg-emerald-500"
-                        : "bg-muted",
+                      filled ? "border-primary bg-primary" : "border-transparent bg-muted",
                     )}
                   />
                 </button>

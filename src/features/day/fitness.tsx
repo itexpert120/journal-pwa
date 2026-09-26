@@ -155,7 +155,7 @@ function MealCard({ slot, meal, date, patch }: { slot: MealSlot; meal: Meal; dat
   return (
     <Item>
       <div className="flex items-center justify-between">
-        <h3 className="font-heading text-xl">{MEAL_LABEL[slot]}</h3>
+        <h3 className="text-base font-semibold">{MEAL_LABEL[slot]}</h3>
         {!meal.photoId && (
           <Button variant="ghost" size="sm" onClick={() => file.current?.click()}>
             <Camera /> Photo

@@ -55,7 +55,7 @@ function highlight(text: string, q: string) {
     <>
       {start > 0 && "…"}
       {text.slice(start, i)}
-      <mark className="rounded bg-amber-300/60 px-0.5 text-inherit dark:bg-amber-500/40">{text.slice(i, i + q.length)}</mark>
+      <mark className="rounded bg-primary/20 px-0.5 text-inherit">{text.slice(i, i + q.length)}</mark>
       {text.slice(i + q.length, i + q.length + 120)}
     </>
   )
@@ -101,8 +101,8 @@ export function Component() {
   return (
     <Page
       bar={
-        <header className="z-20 shrink-0 border-b bg-background pt-safe">
-          <div className="flex items-center gap-2 p-3">
+        <header className="glass-bar sticky top-0 z-20 pt-safe">
+          <div className="mx-auto flex max-w-3xl items-center gap-2 p-3 md:px-8">
             <div className="relative flex-1">
               <SearchIcon className="pointer-events-none absolute top-3 left-3 size-5 text-muted-foreground" />
               <Input
@@ -126,15 +126,15 @@ export function Component() {
               <SlidersHorizontal />
             </Button>
           </div>
-          <div className="flex gap-1.5 overflow-x-auto px-3 pb-3 scrollbar-none">
+          <div className="mx-auto flex max-w-3xl gap-1.5 overflow-x-auto px-3 pb-3 scrollbar-none md:px-8">
             {KINDS.map((k) => (
               <button
                 key={k}
                 type="button"
                 onClick={() => set("k", k === "all" ? "" : k)}
                 className={cn(
-                  "h-9 shrink-0 rounded-full border px-4 text-sm capitalize",
-                  kind === k ? "border-primary bg-primary text-primary-foreground" : "bg-card",
+                  "h-9 shrink-0 rounded-full px-4 text-sm font-semibold capitalize transition-colors",
+                  kind === k ? "bg-primary text-primary-foreground" : "bg-muted text-foreground/80",
                 )}
               >
                 {k}
@@ -142,7 +142,7 @@ export function Component() {
             ))}
           </div>
           {showFilters && (
-            <div className="grid grid-cols-[1fr_1fr_auto] items-end gap-2 px-3 pb-3">
+            <div className="mx-auto grid max-w-3xl grid-cols-[1fr_1fr_auto] items-end gap-2 px-3 pb-3 md:px-8">
               <Field label="From">
                 <Input type="date" value={from} onChange={(e) => set("from", e.target.value)} />
               </Field>

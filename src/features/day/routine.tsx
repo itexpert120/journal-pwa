@@ -249,8 +249,8 @@ function Goals({ entry, patch }: SectionProps) {
   return (
     <Section title="Goals & wins" icon={Target}>
       <TodoList items={entry.goals} field="goals" patch={patch} placeholder="Add a micro-goal…" />
-      <div className="mt-2 grid gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-amber-800 dark:text-amber-200">
+      <div className="mt-2 grid gap-2 rounded-2xl bg-accent p-3">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-accent-foreground">
           <Trophy className="size-4" /> Win of the day
         </h3>
         <TextAreaField

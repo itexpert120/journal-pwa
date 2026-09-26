@@ -169,7 +169,7 @@ function DayBlock({ e, d, medicalOnly }: { e: Entry; d: Data; medicalOnly: boole
           <KV k="Schedule" v={e.events.map((ev) => `${ev.time} ${ev.title}`).join(" · ")} />
           <KV k="Goals" v={e.goals.map((g) => `${g.done ? "✓" : "○"} ${g.text}`).join(" · ")} />
           <KV k="Win of the day" v={e.win} />
-          {e.journal.text && <p className="mt-3 font-heading text-lg leading-relaxed whitespace-pre-wrap">{e.journal.text}</p>}
+          {e.journal.text && <p className="mt-3 font-serif text-lg leading-relaxed whitespace-pre-wrap">{e.journal.text}</p>}
           {d.handwriting.get(e.date) && <img src={d.handwriting.get(e.date)} alt="Handwriting" className="mt-2 w-full" />}
           {e.photos.length > 0 && (
             <div className="mt-3 grid grid-cols-3 gap-2">

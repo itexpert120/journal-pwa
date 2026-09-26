@@ -23,55 +23,54 @@ function NavItems({ rail }: { rail?: boolean }) {
         aria-current={active ? "page" : undefined}
         onClick={() => navigator.vibrate?.(6)}
         className={cn(
-          "group flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-muted-foreground transition-colors",
-          rail ? "h-18 w-full" : "h-16 flex-1",
-          active && "text-foreground",
+          "flex flex-col items-center justify-center gap-0.5 rounded-full text-[10px] font-semibold text-foreground/70 transition-[background-color,color,transform] duration-200 active:scale-90",
+          rail ? "h-16 w-16 rounded-2xl" : "h-[54px] flex-1",
+          active && "bg-foreground/[0.07] text-primary dark:bg-white/10",
         )}
       >
-        {/* Material 3–style active indicator pill */}
-        <span
-          className={cn(
-            "grid h-8 w-14 place-items-center rounded-full transition-all duration-200 group-active:scale-90",
-            active ? "bg-primary/15 text-primary" : "",
-          )}
-        >
-          <Icon className={cn("size-[22px]", active && "stroke-[2.4]")} />
-        </span>
+        <Icon className={cn("size-6", active && "stroke-[2.3]")} />
         {label}
       </NavLink>
     )
   })
 }
 
+/** Height reserved at the bottom of scroll areas so content can scroll out from under the floating tab bar. */
+export const TAB_BAR_SPACE = "pb-[calc(env(safe-area-inset-bottom)+6.5rem)] md:pb-12"
+
 /**
- * Phone: content column + bottom tab bar in the thumb zone.
- * Tablet (md+): navigation rail on the left edge, content fills the rest.
- * Routes scroll inside their own <main>, so bars never bounce away on iOS.
+ * Phone: floating glass capsule tab bar over the content (content scrolls beneath it).
+ * Tablet (md+): glass navigation rail on the left.
  */
 export function AppShell() {
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-background md:flex-row">
+    <div className="relative flex h-dvh overflow-hidden bg-background">
       <nav
         aria-label="Primary"
-        className="no-print z-30 hidden w-24 shrink-0 flex-col items-center gap-2 border-r bg-card/60 pt-safe pb-safe pl-safe md:flex"
+        className="no-print glass-bar z-30 hidden w-24 shrink-0 flex-col items-center gap-2 pt-safe pb-safe pl-safe shadow-[0.5px_0_0_0_var(--border)] md:flex"
       >
-        <img src="/favicon.svg" alt="" className="mt-4 mb-4 size-10 rounded-xl" />
+        <img src="/favicon.svg" alt="" className="mt-5 mb-3 size-10 rounded-[11px] shadow-sm" />
         <NavItems rail />
       </nav>
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col md:pr-safe">
+      <div className="relative flex min-h-0 min-w-0 flex-1 flex-col md:pr-safe">
         <Outlet />
       </div>
       <nav
         aria-label="Primary"
-        className="no-print z-30 flex shrink-0 border-t bg-background/90 pb-safe backdrop-blur-xl md:hidden"
+        className="no-print pointer-events-none absolute inset-x-0 bottom-0 z-30 px-4 pb-[max(env(safe-area-inset-bottom),12px)] md:hidden"
       >
-        <NavItems />
+        <div className="glass pointer-events-auto mx-auto flex max-w-md items-center rounded-full p-1">
+          <NavItems />
+        </div>
       </nav>
     </div>
   )
 }
 
-/** Standard page scaffold: title bar + scrolling body with a readable max width on tablets. */
+/**
+ * Standard page: one scroll container with a sticky glass title bar,
+ * so content blurs beneath the bar as it scrolls — like iOS navigation bars.
+ */
 export function Page({
   title,
   actions,
@@ -93,23 +92,23 @@ export function Page({
   wide?: boolean
 }) {
   return (
-    <>
+    <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
       {bar ?? (
-        <header className="no-print z-20 shrink-0 border-b bg-background/90 pt-safe backdrop-blur-xl">
+        <header className="no-print glass-bar sticky top-0 z-20 pt-safe">
           <div className={cn("mx-auto flex h-14 w-full items-center gap-2 px-4 md:h-16 md:px-8", back && "pl-1 md:pl-4", !wide && "max-w-3xl")}>
             {back && (
-              <Link to={back} viewTransition aria-label="Back" className="-mr-1 grid size-11 place-items-center rounded-full active:bg-muted">
+              <Link to={back} viewTransition aria-label="Back" className="-mr-1 grid size-11 place-items-center rounded-full text-primary active:bg-muted">
                 <ChevronLeft className="size-7" />
               </Link>
             )}
-            <h1 className="min-w-0 flex-1 truncate text-[2rem] leading-none md:text-4xl">{title}</h1>
+            <h1 className="min-w-0 flex-1 truncate text-[1.75rem] leading-none md:text-[2rem]">{title}</h1>
             {actions}
           </div>
         </header>
       )}
-      <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-        <div className={cn("mx-auto w-full px-4 pt-4 pb-12 md:px-8 md:pt-6", !wide && "max-w-3xl", className)}>{children}</div>
-      </main>
-    </>
+      <div className={cn("mx-auto w-full px-4 pt-4 md:px-8 md:pt-6", TAB_BAR_SPACE, !wide && "max-w-3xl", className)}>
+        {children}
+      </div>
+    </main>
   )
 }

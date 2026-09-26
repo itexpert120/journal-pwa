@@ -76,7 +76,7 @@ export function Component() {
         <div className="flex items-center gap-4">
           {photo && <img src={photo} alt="" className="size-20 rounded-full object-cover" />}
           <div>
-            <p className="font-heading text-4xl leading-tight">{p.legalName || "Name not set"}</p>
+            <p className="text-3xl font-bold tracking-tight">{p.legalName || "Name not set"}</p>
             {p.preferredName && <p className="text-muted-foreground">“{p.preferredName}”</p>}
           </div>
         </div>
