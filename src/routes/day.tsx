@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DatePickerDrawer } from "@/components/date-picker-drawer"
 import { useEntry, prefetchEntry } from "@/hooks/use-entry"
-import { TAB_BAR_SPACE } from "@/components/app-shell"
+import { BarButton, TAB_BAR_SPACE } from "@/components/app-shell"
+import { setNav } from "@/lib/nav"
+import { useScrolled } from "@/hooks/use-scrolled"
 import { fromISO, isISODate, shiftISO, toISO, todayISO, type ISODate } from "@/lib/date"
 import { cn } from "@/lib/utils"
 import { HeaderBlock } from "@/features/day/header-block"
@@ -37,6 +39,7 @@ function useFlipTo() {
     const to = `/day/${target}${params.size ? `?${params}` : ""}`
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches
     if (!document.startViewTransition || reduce) return navigate(to)
+    delete document.documentElement.dataset.nav
     document.documentElement.dataset.flip = dir
     const t = document.startViewTransition(() => flushSync(() => navigate(to)))
     t.finished.finally(() => delete document.documentElement.dataset.flip)
@@ -97,6 +100,7 @@ function DayPage({ date }: { date: ISODate }) {
   const isToday = date === todayISO()
   const swipeRef = useSwipe((dir) => flipTo(shiftISO(date, dir), date))
   const monthStrip = useRef<HTMLDivElement>(null)
+  const scrolled = useScrolled(swipeRef)
 
   // Warm neighbours so swipes render instantly.
   useEffect(() => {
@@ -124,77 +128,77 @@ function DayPage({ date }: { date: ISODate }) {
   return (
     <Tabs value={section} onValueChange={(v) => setSection(String(v))} className="flex min-h-0 flex-1 flex-col gap-0">
       <main ref={swipeRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-      <header className="no-print glass-bar sticky top-0 z-20 pt-safe">
-        <div className="mx-auto flex h-16 w-full max-w-5xl items-center gap-1 px-2 md:h-18 md:px-6">
-          <Button variant="ghost" size="icon" aria-label="Previous day" onClick={() => flipTo(shiftISO(date, -1), date)}>
-            <ChevronLeft className="size-6" />
-          </Button>
+      {/* Transparent nav layer: glass controls over a scroll-edge blur. */}
+      <header className="no-print sticky top-0 z-20 pt-safe">
+        <div aria-hidden className={cn("edge-top transition-opacity duration-200", scrolled ? "opacity-100" : "opacity-0")} />
+        <div className="mx-auto flex h-[54px] w-full max-w-5xl items-center gap-2 px-4 md:px-6">
+          <BarButton label="Previous day" onClick={() => flipTo(shiftISO(date, -1), date)}>
+            <ChevronLeft strokeWidth={2.4} />
+          </BarButton>
           <button
             type="button"
-            className="flex min-w-0 flex-1 flex-col items-center rounded-xl py-1 transition-transform active:scale-[0.97] md:items-start md:px-2"
+            className="flex min-w-0 flex-1 flex-col items-center rounded-full py-0.5 transition-transform active:scale-[0.97]"
             onClick={() => setPicker(true)}
             aria-label={`Change date, currently ${format(d, "EEEE d MMMM yyyy")}`}
           >
-            <span className="font-heading text-[1.7rem] leading-tight font-bold tracking-tight md:text-[2.1rem]">{format(d, "EEEE")}</span>
-            <span className="text-[13px] font-medium text-muted-foreground tabular-nums">
+            <span className="text-[17px] leading-tight font-semibold">{format(d, "EEEE")}</span>
+            <span className="text-[13px] text-muted-foreground tabular-nums">
               {format(d, "d MMMM yyyy")}
-              {isToday && <span className="ml-1.5 text-primary">· Today</span>}
+              {isToday && <span className="font-semibold text-primary"> · Today</span>}
             </span>
           </button>
           {!isToday && (
-            <Button size="sm" variant="secondary" className="rounded-full" onClick={() => flipTo(todayISO(), date)}>
+            <BarButton label="Go to today" onClick={() => flipTo(todayISO(), date)} className="px-3.5 text-[15px] font-semibold text-primary">
               Today
-            </Button>
+            </BarButton>
           )}
-          <Button variant="ghost" size="icon" aria-label="Next day" onClick={() => flipTo(shiftISO(date, 1), date)}>
-            <ChevronRight className="size-6" />
-          </Button>
+          <BarButton label="Next day" onClick={() => flipTo(shiftISO(date, 1), date)}>
+            <ChevronRight strokeWidth={2.4} />
+          </BarButton>
         </div>
 
-        {/* Binder dividers: permanent Profile tab, then year + month tabs. */}
-        <div
-          ref={monthStrip}
-          className="mx-auto flex w-full max-w-5xl items-center gap-1 overflow-x-auto px-3 pb-1 scrollbar-none md:px-6"
-          data-no-swipe
-        >
-          <Link
-            to="/profile"
-            viewTransition
-            className="shrink-0 rounded-full bg-foreground px-3.5 py-1.5 text-xs font-semibold text-background active:opacity-80"
-          >
-            Profile
-          </Link>
-          <button
-            type="button"
-            onClick={() => setPicker(true)}
-            className="shrink-0 rounded-full bg-secondary px-3.5 py-1.5 text-xs font-semibold tabular-nums active:opacity-80"
-          >
-            {d.getFullYear()}
-          </button>
-          {MONTHS.map((m, i) => {
-            const active = i === d.getMonth()
-            return (
-              <button
-                key={m}
-                type="button"
-                aria-current={active}
-                onClick={() => goMonth(i)}
-                className={cn(
-                  "min-w-11 shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors md:flex-1",
-                  active ? "bg-primary text-primary-foreground" : "text-muted-foreground active:bg-muted",
-                )}
-              >
-                {m}
-              </button>
-            )
-          })}
+        {/* Binder dividers: permanent Profile tab, year, then months — one glass capsule. */}
+        <div className="mx-auto w-full max-w-5xl px-4 pt-1 md:px-6" data-no-swipe>
+          <div ref={monthStrip} className="glass flex items-center gap-0.5 overflow-x-auto rounded-full p-1 scrollbar-none">
+            <Link
+              to="/profile"
+              viewTransition
+              onClick={() => setNav("tab")}
+              className="shrink-0 rounded-full bg-foreground px-3 py-1.5 text-[13px] font-semibold text-background active:opacity-80"
+            >
+              Profile
+            </Link>
+            <button
+              type="button"
+              onClick={() => setPicker(true)}
+              className="shrink-0 rounded-full px-3 py-1.5 text-[13px] font-bold tabular-nums active:bg-muted"
+            >
+              {d.getFullYear()}
+            </button>
+            {MONTHS.map((m, i) => {
+              const active = i === d.getMonth()
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  aria-current={active}
+                  onClick={() => goMonth(i)}
+                  className={cn(
+                    "min-w-11 shrink-0 rounded-full px-2.5 py-1.5 text-[13px] font-medium transition-colors md:flex-1",
+                    active ? "bg-primary font-semibold text-primary-foreground" : "active:bg-muted",
+                  )}
+                >
+                  {m}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
-        {/* Section switcher lives in the fixed header so content never scrolls under it. */}
-        <div className="px-3 pt-1 pb-2.5 md:px-6">
-          <TabsList className="mx-auto grid max-w-xl grid-cols-4">
+        <div className="mx-auto w-full max-w-5xl px-4 pt-2 pb-2 md:px-6">
+          <TabsList className="glass mx-auto grid max-w-xl grid-cols-4 bg-transparent">
             {SECTIONS.map(({ id, label, icon: Icon }) => (
-              <TabsTrigger key={id} value={id} className="gap-1 px-1 text-[13px]">
+              <TabsTrigger key={id} value={id} className="gap-1 px-1">
                 <Icon />
                 {label}
               </TabsTrigger>
@@ -204,7 +208,7 @@ function DayPage({ date }: { date: ISODate }) {
       </header>
 
         {entry && (
-          <div className={cn("mx-auto grid w-full max-w-5xl gap-4 bg-background px-4 pt-4 md:px-6 md:pt-6 [view-transition-name:page]", TAB_BAR_SPACE)}>
+          <div className={cn("vt-page mx-auto grid w-full max-w-5xl gap-6 bg-background px-4 pt-3 md:px-6", TAB_BAR_SPACE)}>
             <HeaderBlock date={date} entry={entry} patch={patch} />
             {/* Phones: one column of cards. Tablets: two-column card grid. */}
             <TabsContent value="health" className="grid items-start gap-4 md:grid-cols-2">

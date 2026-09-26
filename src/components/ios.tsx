@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import { useDraft } from "@/hooks/use-draft"
 import { cn } from "@/lib/utils"
+import { setNav } from "@/lib/nav"
 
 // ---------------------------------------------------------------- Group
 
@@ -29,12 +30,12 @@ export function Group({
   return (
     <section className={cn("min-w-0", className)}>
       {(header || action) && (
-        <div className="flex items-end justify-between px-4 pb-1.5">
-          <h3 className="text-[13px] font-normal text-muted-foreground uppercase">{header}</h3>
+        <div className="flex items-end justify-between px-4 pb-2">
+          <h3 className="text-[15px] font-semibold text-muted-foreground">{header}</h3>
           {action && <div className="text-[15px] text-primary">{action}</div>}
         </div>
       )}
-      <div className="overflow-hidden rounded-[1.1rem] bg-card [&>*+*]:relative [&>*+*]:before:pointer-events-none [&>*+*]:before:absolute [&>*+*]:before:top-0 [&>*+*]:before:right-0 [&>*+*]:before:left-4 [&>*+*]:before:h-px [&>*+*]:before:origin-top [&>*+*]:before:scale-y-50 [&>*+*]:before:bg-border [&>*+*]:before:content-['']">
+      <div className="overflow-hidden rounded-[1.625rem] bg-card [&>*+*]:relative [&>*+*]:before:pointer-events-none [&>*+*]:before:absolute [&>*+*]:before:top-0 [&>*+*]:before:right-0 [&>*+*]:before:left-4 [&>*+*]:before:h-px [&>*+*]:before:origin-top [&>*+*]:before:scale-y-50 [&>*+*]:before:bg-border [&>*+*]:before:content-['']">
         {children}
       </div>
       {footer && <p className="px-4 pt-1.5 text-[13px] leading-snug text-muted-foreground">{footer}</p>}
@@ -103,7 +104,7 @@ export function Row({ icon, color, label, detail, value, chevron, to, onClick, d
   const interactive = "transition-colors active:bg-muted"
   if (to)
     return (
-      <Link to={to} viewTransition className={cn(rowBase, interactive, className)}>
+      <Link to={to} viewTransition onClick={() => setNav("push")} className={cn(rowBase, interactive, className)}>
         {body}
       </Link>
     )
@@ -253,7 +254,7 @@ export function DateTimeRow({
         type={type}
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-lg bg-muted px-2.5 py-1.5 text-[17px] text-foreground tabular-nums outline-none [&::-webkit-calendar-picker-indicator]:hidden"
+        className="rounded-full bg-muted px-3 py-1.5 text-[17px] text-foreground tabular-nums outline-none [&::-webkit-calendar-picker-indicator]:hidden"
       />
     </label>
   )
