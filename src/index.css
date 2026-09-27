@@ -130,6 +130,16 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* Base UI pins the hidden input behind Checkbox/Switch at `fixed; top:0`. Inside a
+     transformed ancestor (the page turner) that means the top of the page, so the
+     focus a wrapping <label> gives it on tap scrolls the page up. Keep it beside
+     its control instead. */
+  [data-slot="checkbox"] + input,
+  [data-slot="switch"] + input {
+    position: absolute !important;
+    top: auto !important;
+    left: auto !important;
+  }
   html {
     @apply font-sans;
     /* Inter: SF-like single-storey alternates off; tabular figures where asked. */
