@@ -28,6 +28,8 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
         // Only precache Latin font subsets; others download on demand if ever needed.
         globIgnores: ['**/*-{latin-ext,cyrillic,cyrillic-ext,greek,greek-ext,vietnamese}-*.woff2'],
+        // heic-to (libheif) is a separate ~3 MB chunk, loaded only for HEIC photos.
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },
       devOptions: { enabled: false, type: 'module' },
       manifest: {
