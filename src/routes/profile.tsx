@@ -38,7 +38,7 @@ function Avatar({ profile }: { profile: Profile }) {
       <span className="grid size-full place-items-center overflow-hidden rounded-full bg-linear-to-b from-[#a1a1a6] to-[#86868b] text-white shadow-md">
         {url ? <img src={url} alt="" className="size-full object-cover" /> : <UserRound className="size-14" strokeWidth={1.6} />}
       </span>
-      <span className="glass absolute right-0 bottom-0 grid size-9 place-items-center rounded-full text-primary">
+      <span className="glass-light absolute right-0 bottom-0 grid size-9 place-items-center rounded-full text-primary">
         <Camera className="size-[18px]" />
       </span>
       <input

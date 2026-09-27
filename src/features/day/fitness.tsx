@@ -142,7 +142,7 @@ function MealPhoto({ id, onRemove }: { id: string; onRemove: () => void }) {
   return (
     <div className="relative mx-4 mb-3 overflow-hidden rounded-2xl">
       {url && <img src={url} alt="Meal" className="aspect-[4/3] w-full object-cover" />}
-      <button type="button" aria-label="Remove photo" onClick={onRemove} className="glass absolute top-2 right-2 grid size-9 place-items-center rounded-full">
+      <button type="button" aria-label="Remove photo" onClick={onRemove} className="glass-light absolute top-2 right-2 grid size-9 place-items-center rounded-full">
         <X className="size-4" />
       </button>
     </div>

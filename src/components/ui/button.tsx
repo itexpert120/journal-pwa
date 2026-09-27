@@ -16,7 +16,7 @@ const buttonVariants = cva(
         secondary: "bg-accent text-accent-foreground",
         ghost: "text-foreground active:bg-muted",
         destructive: "bg-destructive/12 text-destructive",
-        glass: "glass text-foreground",
+        glass: "glass-light text-foreground",
         link: "text-primary active:scale-100",
       },
       size: {

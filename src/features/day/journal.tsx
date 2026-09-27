@@ -136,7 +136,7 @@ export function JournalSection({ date, entry, patch }: SectionProps) {
           {/* Floating tool palette, PencilKit-style */}
           {mode === "write" && (
             <div className="sticky bottom-[calc(env(safe-area-inset-bottom)+6.5rem)] z-10 flex justify-center px-3 pb-3 md:bottom-4">
-              <div className="glass flex items-center gap-0.5 rounded-full p-1.5">
+              <div className="glass-light flex items-center gap-0.5 rounded-full p-1.5">
                 {INKS.map((c) => (
                   <button
                     key={c}
