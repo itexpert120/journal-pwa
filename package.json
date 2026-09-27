@@ -21,6 +21,7 @@
     "date-fns": "^4.4.0",
     "dexie": "^4.4.6",
     "dexie-react-hooks": "^4.4.0",
+    "heic-to": "^1.5.2",
     "lucide-react": "^1.48.0",
     "motion": "^13.4.4",
     "qrcode": "^1.5.4",
