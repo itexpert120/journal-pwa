@@ -117,7 +117,7 @@ function DayPage({ date }: { date: ISODate }) {
 
         {/* Binder dividers: permanent Profile tab, year, then months — one glass capsule. */}
         <div className="mx-auto w-full max-w-5xl px-4 pt-1 md:px-6" data-no-swipe>
-          <div className="glass rounded-full p-1">
+          <div className="glass-light rounded-full p-1">
           <ScrollFade scrollRef={monthStrip} className="flex items-center gap-0.5 rounded-full">
             <Link
               to="/profile"
@@ -156,7 +156,7 @@ function DayPage({ date }: { date: ISODate }) {
         </div>
 
         <div className="mx-auto w-full max-w-5xl px-4 pt-2 pb-2 md:px-6">
-          <TabsList className="glass mx-auto grid max-w-xl grid-cols-4 bg-transparent">
+          <TabsList className="glass-light mx-auto grid max-w-xl grid-cols-4 bg-transparent">
             {SECTIONS.map(({ id, label, icon: Icon }) => (
               <TabsTrigger key={id} value={id} className="gap-1 px-1">
                 <Icon />

@@ -107,7 +107,7 @@ export function BarButton({
   className?: string
 }) {
   const cls = cn(
-    "glass flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-full px-2.5 text-[17px] font-medium text-foreground transition-transform active:scale-90 [&_svg]:size-[22px]",
+    "glass-light flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-full px-2.5 text-[17px] font-medium text-foreground transition-transform active:scale-90 [&_svg]:size-[22px]",
     className,
   )
   if (to)

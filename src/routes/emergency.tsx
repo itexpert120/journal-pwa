@@ -60,7 +60,7 @@ export function Component() {
               if (history.length > 1) navigate(-1)
               else navigate("/")
             }}
-            className="glass grid size-11 place-items-center rounded-full active:scale-90"
+            className="glass-light grid size-11 place-items-center rounded-full active:scale-90"
           >
             <ChevronLeft className="size-[22px]" strokeWidth={2.4} />
           </button>
