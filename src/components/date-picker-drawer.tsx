@@ -3,7 +3,7 @@ import { addMonths, format, setMonth, setYear } from "date-fns"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import { MonthGrid } from "@/components/month-grid"
-import { SheetBar } from "@/components/ios"
+import { ActionRow, Group, SheetBar } from "@/components/ios"
 import { ScrollFade } from "@/components/scroll-fade"
 import { fromISO, todayISO, type ISODate } from "@/lib/date"
 import { cn } from "@/lib/utils"
@@ -16,17 +16,28 @@ export function DatePickerDrawer({
   onOpenChange,
   value,
   onPick,
+  title = "Go to Date",
+  onClear,
 }: {
   open: boolean
   onOpenChange: (o: boolean) => void
-  value: ISODate
+  /** Empty or undefined opens on today with nothing selected. */
+  value: ISODate | undefined
   onPick: (d: ISODate) => void
+  title?: React.ReactNode
+  onClear?: () => void
 }) {
-  const [month, setMonthState] = useState(() => fromISO(value))
+  const [month, setMonthState] = useState(() => fromISO(value || todayISO()))
   const [yearText, setYearText] = useState(String(month.getFullYear()))
   const go = (d: Date) => {
     setMonthState(d)
     setYearText(String(d.getFullYear()))
+  }
+  // Start from the current value each time the sheet opens.
+  const [wasOpen, setWasOpen] = useState(open)
+  if (open !== wasOpen) {
+    setWasOpen(open)
+    if (open) go(fromISO(value || todayISO()))
   }
   const pick = (d: ISODate) => {
     onPick(d)
@@ -34,16 +45,10 @@ export function DatePickerDrawer({
   }
 
   return (
-    <Drawer
-      open={open}
-      onOpenChange={(o) => {
-        if (o) go(fromISO(value))
-        onOpenChange(o)
-      }}
-    >
+    <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
         <SheetBar
-          title="Go to Date"
+          title={title}
           onCancel={() => onOpenChange(false)}
           onDone={() => pick(todayISO())}
           doneLabel="Today"
@@ -87,7 +92,20 @@ export function DatePickerDrawer({
               </button>
             ))}
           </ScrollFade>
-          <MonthGrid month={month} selected={value} onSelect={pick} size="lg" />
+          <MonthGrid month={month} selected={value || undefined} onSelect={pick} size="lg" />
+          {onClear && (
+            <Group>
+              <ActionRow
+                destructive
+                onClick={() => {
+                  onClear()
+                  onOpenChange(false)
+                }}
+              >
+                Clear Date
+              </ActionRow>
+            </Group>
+          )}
         </div>
       </DrawerContent>
     </Drawer>

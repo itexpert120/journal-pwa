@@ -103,6 +103,7 @@ function RemindersGroup({ s }: { s: Settings }) {
         icon={BookHeart}
         color="purple"
         label="Journal Prompt"
+        clearable
         type="time"
         value={s.reminders.journal}
         onChange={(v) => updateSettings((x) => void (x.reminders.journal = v || undefined))}

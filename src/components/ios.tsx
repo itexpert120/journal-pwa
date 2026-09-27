@@ -8,7 +8,11 @@ import { Check, ChevronRight, CircleMinus, CirclePlus, Minus, Plus, type LucideI
 import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Drawer, DrawerContent } from "@/components/ui/drawer"
+import { format } from "date-fns"
+import { DatePickerDrawer } from "@/components/date-picker-drawer"
+import { TimePickerDrawer } from "@/components/time-picker-drawer"
 import { useDraft } from "@/hooks/use-draft"
+import { formatTime12, fromISO } from "@/lib/date"
 import { cn } from "@/lib/utils"
 import { setNav } from "@/lib/nav"
 
@@ -231,7 +235,10 @@ export function NoteRow({
   )
 }
 
-/** Native date/time picker styled as a trailing value. */
+/**
+ * Date or time shown as a trailing capsule; tapping opens our own picker sheet.
+ * (Native <input type=date|time> pickers don't open on some Android browsers.)
+ */
 export function DateTimeRow({
   label,
   type,
@@ -239,6 +246,7 @@ export function DateTimeRow({
   onChange,
   icon,
   color,
+  clearable,
 }: {
   label: React.ReactNode
   type: "date" | "time"
@@ -246,18 +254,25 @@ export function DateTimeRow({
   onChange: (v: string) => void
   icon?: LucideIcon
   color?: TileColor
+  /** Offer a Clear button, which reports "". */
+  clearable?: boolean
 }) {
+  const [open, setOpen] = useState(false)
+  const shown = value ? (type === "date" ? format(fromISO(value), "d MMM yyyy") : formatTime12(value)) : "Not Set"
+  const onClear = clearable ? () => onChange("") : undefined
   return (
-    <label className={cn(rowBase, "gap-3")}>
-      {icon && <IconTile icon={icon} color={color} />}
-      <span className="flex-1">{label}</span>
-      <input
-        type={type}
-        value={value ?? ""}
-        onChange={(e) => onChange(e.target.value)}
-        className="rounded-full bg-muted px-3 py-1.5 text-[17px] text-foreground tabular-nums outline-none [&::-webkit-calendar-picker-indicator]:hidden"
-      />
-    </label>
+    <>
+      <button type="button" onClick={() => setOpen(true)} className={cn(rowBase, "gap-3 transition-colors active:bg-muted")}>
+        {icon && <IconTile icon={icon} color={color} />}
+        <span className="flex-1">{label}</span>
+        <span className={cn("rounded-full bg-muted px-3 py-1.5 tabular-nums", !value && "text-muted-foreground")}>{shown}</span>
+      </button>
+      {type === "date" ? (
+        <DatePickerDrawer open={open} onOpenChange={setOpen} title={label} value={value} onPick={onChange} onClear={onClear} />
+      ) : (
+        <TimePickerDrawer open={open} onOpenChange={setOpen} title={label} value={value} onPick={onChange} onClear={onClear} />
+      )}
+    </>
   )
 }
 

@@ -314,7 +314,7 @@ function Checkups({ date, entry, patch }: SectionProps) {
               <SelectRow label="Type" value={c.kind} options={CHECKUP_KINDS} onChange={(v) => upd((x) => void (x.kind = v))} />
               <TextRow label="With" value={c.title} onCommit={(v) => upd((x) => void (x.title = v))} placeholder="Doctor, clinic or test" autoFocus={!c.title} />
               <DateTimeRow label="Time" type="time" value={c.time} onChange={(v) => upd((x) => void (x.time = v))} />
-              <DateTimeRow label="Follow-up" type="date" value={c.followUp} onChange={(v) => upd((x) => void (x.followUp = v || undefined))} />
+              <DateTimeRow label="Follow-up" type="date" value={c.followUp} onChange={(v) => upd((x) => void (x.followUp = v || undefined))} clearable />
             </Group>
             <Group header="Notes">
               <NoteRow value={c.note} onCommit={(v) => upd((x) => void (x.note = v))} placeholder="Results, advice…" />

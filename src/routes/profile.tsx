@@ -300,7 +300,7 @@ export function Component() {
         <div className="grid gap-8">
           <Group header="Medical">
             <SelectRow label="Blood Type" value={profile.bloodGroup} options={BLOOD_GROUPS} onChange={(v) => upd((p) => void (p.bloodGroup = v))} placeholder="Not Set" />
-            <DateTimeRow label="Date of Birth" type="date" value={profile.dob} onChange={(v) => upd((p) => void (p.dob = v || undefined))} />
+            <DateTimeRow label="Date of Birth" type="date" value={profile.dob} onChange={(v) => upd((p) => void (p.dob = v || undefined))} clearable />
             <NumberRow
               label="Height"
               unit={profile.height ? `cm · ${cmLabel(profile.height, "ft")}` : "cm"}

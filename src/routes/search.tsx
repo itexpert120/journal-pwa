@@ -149,8 +149,8 @@ export function Component() {
         </div>
         {showFilters && (
           <Group>
-            <DateTimeRow label="From" type="date" value={from} onChange={(v) => set("from", v)} />
-            <DateTimeRow label="To" type="date" value={to} onChange={(v) => set("to", v)} />
+            <DateTimeRow label="From" type="date" value={from} onChange={(v) => set("from", v)} clearable />
+            <DateTimeRow label="To" type="date" value={to} onChange={(v) => set("to", v)} clearable />
             {(from || to) && (
               <ActionRow destructive onClick={clearDates}>
                 Clear Dates
