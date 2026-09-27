@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import { ImagePlus } from "lucide-react"
+import { ImagePlus, Loader2 } from "lucide-react"
 import { EditSheet, Group, ListEditor, TextRow } from "@/components/ios"
 import { db, saveFile, type Photo } from "@/lib/db"
 import { compressImage } from "@/lib/image"
@@ -32,9 +32,22 @@ export function PhotoGallery({
 }) {
   const input = useRef<HTMLInputElement>(null)
   const [openId, setOpenId] = useState<string>()
+  const [busy, setBusy] = useState(false)
   const open = photos.find((p) => p.id === openId)
   const openUrl = useFileUrl(open?.fileId)
   const upd = (id: string, fn: (p: Photo) => Photo) => onChange((ps) => ps.map((p) => (p.id === id ? fn(p) : p)))
+
+  const addPhotos = async (files: File[]) => {
+    if (!files.length) return
+    setBusy(true)
+    try {
+      const added: Photo[] = []
+      for (const f of files) added.push({ id: uid(), fileId: await saveFile(await compressImage(f), date), tags: [] })
+      onChange((ps) => [...ps, ...added])
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <>
@@ -42,10 +55,21 @@ export function PhotoGallery({
         {photos.map((p) => (
           <Tile key={p.id} photo={p} onOpen={() => setOpenId(p.id)} />
         ))}
+        {busy && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-muted text-[13px] font-medium text-muted-foreground"
+          >
+            <Loader2 className="size-6 animate-spin" />
+            Processing…
+          </div>
+        )}
         <button
           type="button"
+          disabled={busy}
           onClick={() => input.current?.click()}
-          className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-muted text-[13px] font-medium text-primary active:opacity-70"
+          className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-muted text-[13px] font-medium text-primary active:opacity-70 disabled:opacity-50"
         >
           <ImagePlus className="size-6" />
           Add photos
@@ -57,12 +81,11 @@ export function PhotoGallery({
         accept="image/*"
         multiple
         hidden
-        onChange={async (e) => {
+        disabled={busy}
+        onChange={(e) => {
           const files = Array.from(e.target.files ?? [])
           e.target.value = ""
-          const added: Photo[] = []
-          for (const f of files) added.push({ id: uid(), fileId: await saveFile(await compressImage(f), date), tags: [] })
-          onChange((ps) => [...ps, ...added])
+          void addPhotos(files)
         }}
       />
       <EditSheet
