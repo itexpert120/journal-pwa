@@ -21,7 +21,7 @@ function AddRow({ placeholder, onAdd }: { placeholder: string; onAdd: (text: str
   }
   return (
     <form
-      className="flex min-h-[52px] items-center gap-3 pl-4"
+      className="flex min-h-[3.25rem] items-center gap-3 pl-4"
       onSubmit={(e) => {
         e.preventDefault()
         commit()
@@ -34,7 +34,7 @@ function AddRow({ placeholder, onAdd }: { placeholder: string; onAdd: (text: str
         onBlur={commit}
         placeholder={placeholder}
         enterKeyHint="done"
-        className="min-w-0 flex-1 bg-transparent py-3 pr-4 text-[17px] outline-none placeholder:text-muted-foreground/70"
+        className="min-w-0 flex-1 bg-transparent py-3 pr-4 text-[1.0625rem] outline-none placeholder:text-muted-foreground/70"
       />
     </form>
   )
@@ -144,7 +144,7 @@ function Schedule({ entry, patch }: SectionProps) {
           const evs = entry.events.filter((x) => hourOf(x.time) === h)
           return (
             <li key={h} className="grid min-h-11 grid-cols-[4.25rem_1fr] items-start">
-              <span className={cn("pt-3 pl-4 text-[13px] text-muted-foreground tabular-nums", h === nowHour && "font-semibold text-alert")}>
+              <span className={cn("pt-3 pl-4 text-[0.8125rem] text-muted-foreground tabular-nums", h === nowHour && "font-semibold text-alert")}>
                 {formatTime12(`${hh}:00`).replace(":00", "")}
               </span>
               <div className="grid min-h-11 content-center gap-1 border-t border-border/60 py-1 pr-4">
@@ -153,7 +153,7 @@ function Schedule({ entry, patch }: SectionProps) {
                     key={x.id}
                     type="button"
                     onClick={() => setEdit(x.id)}
-                    className="flex items-center gap-2 rounded-lg border-l-[3px] border-primary bg-primary/12 px-2.5 py-1.5 text-left text-[15px] active:opacity-70"
+                    className="flex items-center gap-2 rounded-lg border-l-[0.1875rem] border-primary bg-primary/12 px-2.5 py-1.5 text-left text-[0.9375rem] active:opacity-70"
                   >
                     <span className="font-semibold text-primary tabular-nums">{formatTime12(x.time)}</span>
                     <span className="truncate">{x.title || "New Event"}</span>

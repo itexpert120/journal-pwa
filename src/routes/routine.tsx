@@ -14,21 +14,21 @@ function Item({ id, text }: { id: string; text: string }) {
     }),
   )
   return (
-    <div className="flex min-h-[52px] items-center gap-3 pl-3">
+    <div className="flex min-h-[3.25rem] items-center gap-3 pl-3">
       <button
         type="button"
         aria-label={`Remove ${text}`}
         onClick={() => updateSettings((x) => void (x.routine = x.routine.filter((z) => z.id !== id)))}
         className="grid size-8 place-items-center text-destructive active:scale-90"
       >
-        <CircleMinus className="size-[22px] fill-destructive text-white" />
+        <CircleMinus className="size-[1.375rem] fill-destructive text-white" />
       </button>
       <input
         value={d.draft}
         onChange={(e) => d.change(e.target.value)}
         onBlur={d.flush}
         enterKeyHint="done"
-        className="min-w-0 flex-1 bg-transparent py-3 pr-4 text-[17px] outline-none"
+        className="min-w-0 flex-1 bg-transparent py-3 pr-4 text-[1.0625rem] outline-none"
       />
     </div>
   )
@@ -47,20 +47,20 @@ export function Component() {
       <Group footer="These non-negotiables appear as a checklist on every day's page.">
         {s?.routine.map((r) => <Item key={r.id} id={r.id} text={r.text} />)}
         <form
-          className="flex min-h-[52px] items-center gap-3 pl-3"
+          className="flex min-h-[3.25rem] items-center gap-3 pl-3"
           onSubmit={(e) => {
             e.preventDefault()
             add()
           }}
         >
-          <CirclePlus className="m-[5px] size-[22px] fill-success text-white" />
+          <CirclePlus className="m-[0.3125rem] size-[1.375rem] fill-success text-white" />
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onBlur={add}
             placeholder="Add routine item"
             enterKeyHint="done"
-            className="min-w-0 flex-1 bg-transparent py-3 pr-4 text-[17px] outline-none placeholder:text-muted-foreground/60"
+            className="min-w-0 flex-1 bg-transparent py-3 pr-4 text-[1.0625rem] outline-none placeholder:text-muted-foreground/60"
           />
         </form>
       </Group>

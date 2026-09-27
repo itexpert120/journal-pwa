@@ -82,24 +82,24 @@ export function VoiceRecorder({ onSave }: { onSave: (blob: Blob) => void }) {
         type="button"
         onClick={rec ? stop : start}
         aria-label={rec ? "Stop recording" : "Record voice note"}
-        className="grid size-14 shrink-0 place-items-center rounded-full border-[3px] border-muted-foreground/40 active:scale-95"
+        className="grid size-14 shrink-0 place-items-center rounded-full border-[0.1875rem] border-muted-foreground/40 active:scale-95"
       >
         <span className={cn("bg-[#ff3b30] transition-all duration-300", rec ? "size-6 rounded-md" : "size-10 rounded-full")} />
       </button>
       <div className="min-w-0 flex-1">
         {rec ? (
           <>
-            <div className="flex h-8 items-center gap-[2px]" aria-hidden>
+            <div className="flex h-8 items-center gap-[0.125rem]" aria-hidden>
               {levels.map((l, i) => (
-                <span key={i} className="w-[3px] rounded-full bg-[#ff3b30]" style={{ height: `${Math.max(8, l * 100)}%` }} />
+                <span key={i} className="w-[0.1875rem] rounded-full bg-[#ff3b30]" style={{ height: `${Math.max(8, l * 100)}%` }} />
               ))}
             </div>
-            <p className="text-[15px] text-[#ff3b30] tabular-nums">{fmt(secs)}</p>
+            <p className="text-[0.9375rem] text-[#ff3b30] tabular-nums">{fmt(secs)}</p>
           </>
         ) : (
           <>
-            <p className="text-[17px]">New Recording</p>
-            <p className="text-[13px] text-muted-foreground">Tap to record a voice note</p>
+            <p className="text-[1.0625rem]">New Recording</p>
+            <p className="text-[0.8125rem] text-muted-foreground">Tap to record a voice note</p>
           </>
         )}
       </div>
@@ -115,7 +115,7 @@ export function VoiceNote({ id, index, onDelete }: { id: string; index: number; 
   const [progress, setProgress] = useState(0)
   const [duration, setDuration] = useState(0)
   return (
-    <div className="flex min-h-[60px] items-center gap-3 px-4">
+    <div className="flex min-h-[3.75rem] items-center gap-3 px-4">
       <button
         type="button"
         aria-label={playing ? "Pause" : "Play"}
@@ -125,16 +125,16 @@ export function VoiceNote({ id, index, onDelete }: { id: string; index: number; 
         {playing ? <Pause className="size-4 fill-current" /> : <Play className="ml-0.5 size-4 fill-current" />}
       </button>
       <div className="min-w-0 flex-1">
-        <p className="text-[17px]">Voice Note {index}</p>
+        <p className="text-[1.0625rem]">Voice Note {index}</p>
         <div className="mt-1.5 flex items-center gap-2">
           <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
             <div className="h-full bg-primary" style={{ width: `${duration ? (progress / duration) * 100 : 0}%` }} />
           </div>
-          <span className="text-[13px] text-muted-foreground tabular-nums">{fmt(duration && Number.isFinite(duration) ? duration - progress : 0)}</span>
+          <span className="text-[0.8125rem] text-muted-foreground tabular-nums">{fmt(duration && Number.isFinite(duration) ? duration - progress : 0)}</span>
         </div>
       </div>
       <button type="button" aria-label="Delete voice note" onClick={onDelete} className="grid size-9 place-items-center rounded-full text-muted-foreground active:bg-muted">
-        <Trash2 className="size-[18px]" />
+        <Trash2 className="size-[1.125rem]" />
       </button>
       {url && (
         <audio

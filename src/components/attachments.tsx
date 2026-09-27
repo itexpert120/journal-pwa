@@ -21,7 +21,7 @@ function Thumb({ id, onRemove }: { id: string; onRemove: () => void }) {
         {isImage && url ? (
           <img src={url} alt={file?.name ?? "Attachment"} className="size-full object-cover" />
         ) : (
-          <div className="grid place-items-center gap-1 p-1 text-center text-[10px] text-muted-foreground">
+          <div className="grid place-items-center gap-1 p-1 text-center text-[0.625rem] text-muted-foreground">
             <FileText className="size-6" />
             <span className="line-clamp-2 break-all">{file?.name}</span>
           </div>
@@ -70,7 +70,7 @@ export function Attachments({
       ))}
       <button
         type="button"
-        className="flex size-20 shrink-0 flex-col items-center justify-center gap-1 rounded-xl bg-muted text-[13px] font-medium text-primary active:opacity-70"
+        className="flex size-20 shrink-0 flex-col items-center justify-center gap-1 rounded-xl bg-muted text-[0.8125rem] font-medium text-primary active:opacity-70"
         onClick={() => input.current?.click()}
       >
         <Paperclip className="size-5" />

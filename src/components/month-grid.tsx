@@ -67,7 +67,7 @@ export function MonthGrid({
             )}
           >
             <span className="leading-none">{d.getDate()}</span>
-            {mark && <span className="absolute -bottom-0.5 text-[10px] leading-none">{mark}</span>}
+            {mark && <span className="absolute -bottom-0.5 text-[0.625rem] leading-none">{mark}</span>}
           </button>
         )
       })}

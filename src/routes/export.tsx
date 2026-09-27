@@ -56,7 +56,7 @@ export function Component() {
                       setFrom(f)
                       setTo(todayISO())
                     }}
-                    className={cn("h-9 rounded-lg text-[13px] font-semibold transition-colors", on ? "bg-card shadow-sm" : "text-muted-foreground")}
+                    className={cn("h-9 rounded-lg text-[0.8125rem] font-semibold transition-colors", on ? "bg-card shadow-sm" : "text-muted-foreground")}
                   >
                     {l}
                   </button>

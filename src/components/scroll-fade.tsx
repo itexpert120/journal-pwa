@@ -33,7 +33,7 @@ export function ScrollFade({
     }
   }, [ref])
 
-  const fade = "28px"
+  const fade = "1.75rem"
   const mask = `linear-gradient(to right, ${edges.start ? "transparent" : "#000"}, #000 ${fade}, #000 calc(100% - ${fade}), ${edges.end ? "transparent" : "#000"})`
   return (
     <div

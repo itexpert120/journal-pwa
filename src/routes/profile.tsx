@@ -39,7 +39,7 @@ function Avatar({ profile }: { profile: Profile }) {
         {url ? <img src={url} alt="" className="size-full object-cover" /> : <UserRound className="size-14" strokeWidth={1.6} />}
       </span>
       <span className="glass absolute right-0 bottom-0 grid size-9 place-items-center rounded-full text-primary">
-        <Camera className="size-[18px]" />
+        <Camera className="size-[1.125rem]" />
       </span>
       <input
         ref={input}
@@ -87,7 +87,7 @@ function SignatureRow({ profile }: { profile: Profile }) {
           setStrokes(saved)
           setOpen(true)
         }}
-        className="flex min-h-[52px] w-full items-center gap-3 px-4 text-left text-[17px] active:bg-muted"
+        className="flex min-h-[3.25rem] w-full items-center gap-3 px-4 text-left text-[1.0625rem] active:bg-muted"
       >
         <span className="flex-1">Signature</span>
         {saved.length ? (
@@ -252,7 +252,7 @@ export function Component() {
         <Link
           to="/emergency"
           viewTransition
-          className="flex h-9 items-center gap-1.5 rounded-full bg-alert px-3.5 text-[15px] font-semibold text-white active:opacity-80"
+          className="flex h-9 items-center gap-1.5 rounded-full bg-alert px-3.5 text-[0.9375rem] font-semibold text-white active:opacity-80"
         >
           <Siren className="size-4" /> SOS
         </Link>
@@ -264,9 +264,9 @@ export function Component() {
           <Avatar profile={profile} />
           <div>
             <p className="text-2xl font-bold tracking-tight">{profile.preferredName || profile.legalName || "Your Name"}</p>
-            {profile.legalName && profile.preferredName && <p className="text-[15px] text-muted-foreground">{profile.legalName}</p>}
+            {profile.legalName && profile.preferredName && <p className="text-[0.9375rem] text-muted-foreground">{profile.legalName}</p>}
             {(profile.bloodGroup || age !== undefined) && (
-              <p className="mt-1 text-[15px] text-muted-foreground">
+              <p className="mt-1 text-[0.9375rem] text-muted-foreground">
                 {[age !== undefined && `${age} years`, profile.bloodGroup && `Blood ${profile.bloodGroup}`].filter(Boolean).join(" · ")}
               </p>
             )}

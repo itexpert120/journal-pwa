@@ -124,7 +124,7 @@ export function Component() {
             enterKeyHint="search"
             autoCapitalize="none"
             aria-label="Search"
-            className="min-w-0 flex-1 bg-transparent text-[17px] outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
+            className="min-w-0 flex-1 bg-transparent text-[1.0625rem] outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
           />
           {q && (
             <button type="button" aria-label="Clear" onClick={() => set("q", "")} className="grid size-6 place-items-center rounded-full bg-muted-foreground/40 text-background">
@@ -139,7 +139,7 @@ export function Component() {
               type="button"
               onClick={() => set("k", k === "all" ? "" : k)}
               className={cn(
-                "h-9 shrink-0 rounded-full px-4 text-[15px] font-medium capitalize transition-colors active:scale-95",
+                "h-9 shrink-0 rounded-full px-4 text-[0.9375rem] font-medium capitalize transition-colors active:scale-95",
                 kind === k ? "bg-foreground text-background" : "bg-card text-foreground",
               )}
             >
@@ -166,7 +166,7 @@ export function Component() {
             ) : (
               <div className="mt-2 flex flex-wrap justify-center gap-2">
                 {["#health", "#family", "#travel", "#birthday"].map((t) => (
-                  <button key={t} type="button" onClick={() => set("q", t)} className="h-9 rounded-full bg-card px-4 text-[15px] text-primary active:scale-95">
+                  <button key={t} type="button" onClick={() => set("q", t)} className="h-9 rounded-full bg-card px-4 text-[0.9375rem] text-primary active:scale-95">
                     {t}
                   </button>
                 ))}
@@ -184,11 +184,11 @@ export function Component() {
                 className="grid gap-0.5 px-4 py-3 active:bg-muted"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-[15px] font-semibold">{format(fromISO(h.date), "EEE d MMM yyyy")}</span>
-                  <span className="ml-auto text-[13px] text-muted-foreground capitalize">{h.kind}</span>
+                  <span className="text-[0.9375rem] font-semibold">{format(fromISO(h.date), "EEE d MMM yyyy")}</span>
+                  <span className="ml-auto text-[0.8125rem] text-muted-foreground capitalize">{h.kind}</span>
                   <ChevronRight className="size-4 text-muted-foreground/60" />
                 </div>
-                <p className="line-clamp-2 text-[15px] text-muted-foreground">{highlight(h.text, q.startsWith("#") ? "" : q.trim())}</p>
+                <p className="line-clamp-2 text-[0.9375rem] text-muted-foreground">{highlight(h.text, q.startsWith("#") ? "" : q.trim())}</p>
               </Link>
             ))}
           </Group>

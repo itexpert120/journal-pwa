@@ -19,7 +19,7 @@ function Secret({ label, value, onChange, autoFocus }: { label: string; value: s
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Required"
-        className="min-w-0 flex-1 bg-transparent py-3 text-right text-[17px] outline-none placeholder:text-muted-foreground/60"
+        className="min-w-0 flex-1 bg-transparent py-3 text-right text-[1.0625rem] outline-none placeholder:text-muted-foreground/60"
       />
     </FieldRow>
   )
@@ -84,10 +84,10 @@ export function Component() {
     <Page title="Backup" back="/more" backLabel="Settings">
       <div className="grid gap-8">
         <div className="grid place-items-center gap-3 px-6 pt-2 text-center">
-          <span className="grid size-16 place-items-center rounded-[18px] bg-primary text-white shadow-lg shadow-primary/30">
+          <span className="grid size-16 place-items-center rounded-[1.125rem] bg-primary text-white shadow-lg shadow-primary/30">
             <ShieldCheck className="size-9" />
           </span>
-          <p className="text-[15px] text-muted-foreground">
+          <p className="text-[0.9375rem] text-muted-foreground">
             Backups are end-to-end encrypted on this device with your passphrase before they leave it. Save them to Google
             Drive, iCloud Drive or Files. Nobody can read them without the passphrase.
           </p>

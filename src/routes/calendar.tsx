@@ -33,7 +33,7 @@ function DaySummary({ date, onOpen }: { date: string; onOpen: () => void }) {
       {lines.map((l) => (
         <Row key={l.label} label={l.label} value={l.value} />
       ))}
-      {e.journal.text && <p className="line-clamp-3 px-4 py-3 font-serif text-[16px] text-muted-foreground italic">{e.journal.text}</p>}
+      {e.journal.text && <p className="line-clamp-3 px-4 py-3 font-serif text-[1rem] text-muted-foreground italic">{e.journal.text}</p>}
       <Row label={<span className="font-semibold text-primary">Open Day</span>} onClick={onOpen} chevron />
     </Group>
   )
@@ -86,7 +86,7 @@ export function Component() {
             onClick={() => {
               setMonth(startOfMonth(new Date()))
               setSelected(todayISO())
-            }} className="px-4 text-[15px] font-semibold text-primary">
+            }} className="px-4 text-[0.9375rem] font-semibold text-primary">
             Today
           </BarButton>
         )
@@ -98,7 +98,7 @@ export function Component() {
             <button
               type="button"
               onClick={() => setPicker(true)}
-              className="flex items-center gap-1 rounded-full px-2 py-1 text-[17px] font-semibold active:bg-muted"
+              className="flex items-center gap-1 rounded-full px-2 py-1 text-[1.0625rem] font-semibold active:bg-muted"
             >
               {format(month, "MMMM yyyy")}
               <ChevronRight className="size-4 text-primary" strokeWidth={2.6} />
@@ -160,8 +160,8 @@ export function Component() {
               ] as const
             ).map(([v, l]) => (
               <div key={l} className="rounded-[1.25rem] bg-card p-3.5">
-                <p className="text-[28px] leading-none font-bold tabular-nums">{v}</p>
-                <p className="mt-1.5 text-[13px] text-muted-foreground">{l}</p>
+                <p className="text-[1.75rem] leading-none font-bold tabular-nums">{v}</p>
+                <p className="mt-1.5 text-[0.8125rem] text-muted-foreground">{l}</p>
               </div>
             ))}
           </div>

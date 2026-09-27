@@ -131,6 +131,8 @@
     @apply border-border outline-ring/50;
   }
   html {
+    /* The whole UI is sized in rem: 80% of the browser default makes everything 80% scale. */
+    font-size: 80%;
     @apply font-sans;
     /* Inter: SF-like single-storey alternates off; tabular figures where asked. */
     font-feature-settings: "cv11" 1, "ss03" 1;
@@ -145,6 +147,11 @@
   }
   html.dark {
     color-scheme: dark;
+  }
+  @media print {
+    html {
+      font-size: 100%;
+    }
   }
   body {
     @apply bg-background text-foreground antialiased;
@@ -258,8 +265,8 @@
   background-color: var(--paper);
   background-image: linear-gradient(to bottom, transparent calc(2rem - 1px), var(--paper-line) calc(2rem - 1px));
   background-size: 100% 2rem;
-  /* 2rem line box, 19px serif: baseline ≈ 22px, so the rule sits at 24px. */
-  background-position: 0 -7px;
+  /* 2rem line box, 1.1875rem serif: baseline ≈ 1.375rem, so the rule sits at 1.5rem. */
+  background-position: 0 -0.4375rem;
 }
 .paper-grid {
   background-color: var(--paper);
@@ -267,7 +274,7 @@
     linear-gradient(to right, var(--paper-line) 1px, transparent 1px),
     linear-gradient(to bottom, var(--paper-line) 1px, transparent 1px);
   background-size: 1rem 1rem;
-  background-position: 1.25rem -7px;
+  background-position: 1.25rem -0.4375rem;
 }
 .paper-plain {
   background-color: var(--paper);
