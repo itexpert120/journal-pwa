@@ -36,14 +36,14 @@ export function Group({
     <section className={cn("min-w-0", className)}>
       {(header || action) && (
         <div className="flex items-end justify-between px-4 pb-2">
-          <h3 className="text-[0.9375rem] font-semibold text-muted-foreground">{header}</h3>
-          {action && <div className="text-[0.9375rem] text-primary">{action}</div>}
+          <h3 className="text-[15px] font-semibold text-muted-foreground">{header}</h3>
+          {action && <div className="text-[15px] text-primary">{action}</div>}
         </div>
       )}
       <div className="overflow-hidden rounded-[1.625rem] bg-card [&>*+*]:relative [&>*+*]:before:pointer-events-none [&>*+*]:before:absolute [&>*+*]:before:top-0 [&>*+*]:before:right-0 [&>*+*]:before:left-4 [&>*+*]:before:h-px [&>*+*]:before:origin-top [&>*+*]:before:scale-y-50 [&>*+*]:before:bg-border [&>*+*]:before:content-['']">
         {children}
       </div>
-      {footer && <p className="px-4 pt-1.5 text-[0.8125rem] leading-snug text-muted-foreground">{footer}</p>}
+      {footer && <p className="px-4 pt-1.5 text-[13px] leading-snug text-muted-foreground">{footer}</p>}
     </section>
   )
 }
@@ -66,15 +66,15 @@ export type TileColor = keyof typeof TILE
 
 export function IconTile({ icon: Icon, color = "blue", className }: { icon: LucideIcon; color?: TileColor; className?: string }) {
   return (
-    <span className={cn("grid size-[1.875rem] shrink-0 place-items-center rounded-[0.5rem] text-white", TILE[color], className)}>
-      <Icon className="size-[1.125rem]" strokeWidth={2.2} />
+    <span className={cn("grid size-[30px] shrink-0 place-items-center rounded-[8px] text-white", TILE[color], className)}>
+      <Icon className="size-[18px]" strokeWidth={2.2} />
     </span>
   )
 }
 
 // ---------------------------------------------------------------- Rows
 
-const rowBase = "flex min-h-[3.25rem] w-full items-center gap-3 px-4 text-left text-[1.0625rem]"
+const rowBase = "flex min-h-[52px] w-full items-center gap-3 px-4 text-left text-[17px]"
 
 type RowProps = {
   icon?: LucideIcon
@@ -99,7 +99,7 @@ export function Row({ icon, color, label, detail, value, chevron, to, onClick, d
       {icon && <IconTile icon={icon} color={color} />}
       <span className="min-w-0 flex-1 py-2.5">
         <span className={cn("block truncate", destructive && "text-destructive")}>{label}</span>
-        {detail && <span className="block text-[0.8125rem] leading-snug text-muted-foreground">{detail}</span>}
+        {detail && <span className="block text-[13px] leading-snug text-muted-foreground">{detail}</span>}
       </span>
       {value !== undefined && <span className="max-w-[55%] truncate text-right text-muted-foreground">{value}</span>}
       {children}
@@ -147,7 +147,7 @@ export function ActionRow({
 }
 
 const bareInput =
-  "min-w-0 flex-1 bg-transparent py-3 text-right text-[1.0625rem] text-foreground caret-primary outline-none placeholder:text-muted-foreground/60"
+  "min-w-0 flex-1 bg-transparent py-3 text-right text-[17px] text-foreground caret-primary outline-none placeholder:text-muted-foreground/60"
 
 /** Label on the left, borderless control on the right. */
 export function FieldRow({ label, children, unit }: { label: React.ReactNode; children: React.ReactNode; unit?: string }) {
@@ -230,7 +230,7 @@ export function NoteRow({
       onChange={(e) => d.change(e.target.value)}
       onBlur={d.flush}
       placeholder={placeholder}
-      className="block field-sizing-content min-h-24 w-full resize-none bg-transparent px-4 py-3 text-[1.0625rem] caret-primary outline-none placeholder:text-muted-foreground/60"
+      className="block field-sizing-content min-h-24 w-full resize-none bg-transparent px-4 py-3 text-[17px] caret-primary outline-none placeholder:text-muted-foreground/60"
     />
   )
 }
@@ -296,7 +296,7 @@ export function SwitchRow({
       {icon && <IconTile icon={icon} color={color} />}
       <span className="min-w-0 flex-1 py-2.5">
         <span className="block">{label}</span>
-        {detail && <span className="block text-[0.8125rem] text-muted-foreground">{detail}</span>}
+        {detail && <span className="block text-[13px] text-muted-foreground">{detail}</span>}
       </span>
       <Switch checked={checked} onCheckedChange={onChange} />
     </label>
@@ -376,19 +376,19 @@ export function SheetBar({
     <div className="grid h-14 shrink-0 grid-cols-[1fr_auto_1fr] items-center px-2">
       <div>
         {onCancel && (
-          <button type="button" onClick={onCancel} className="h-11 rounded-full px-3 text-[1.0625rem] text-primary active:opacity-60">
+          <button type="button" onClick={onCancel} className="h-11 rounded-full px-3 text-[17px] text-primary active:opacity-60">
             Cancel
           </button>
         )}
       </div>
-      <h2 className="truncate text-[1.0625rem] font-semibold tracking-normal">{title}</h2>
+      <h2 className="truncate text-[17px] font-semibold tracking-normal">{title}</h2>
       <div className="flex justify-end">
         {onDone && (
           <button
             type="button"
             onClick={onDone}
             disabled={doneDisabled}
-            className="h-11 rounded-full px-3 text-[1.0625rem] font-semibold text-primary active:opacity-60 disabled:opacity-40"
+            className="h-11 rounded-full px-3 text-[17px] font-semibold text-primary active:opacity-60 disabled:opacity-40"
           >
             {doneLabel}
           </button>
@@ -447,7 +447,7 @@ export function EmptyState({ icon: Icon, title, children }: { icon: LucideIcon; 
     <div className="grid place-items-center gap-2 px-8 py-14 text-center">
       <Icon className="mb-1 size-12 text-muted-foreground/50" strokeWidth={1.5} />
       <p className="text-xl font-semibold">{title}</p>
-      {children && <div className="text-[0.9375rem] text-muted-foreground">{children}</div>}
+      {children && <div className="text-[15px] text-muted-foreground">{children}</div>}
     </div>
   )
 }
@@ -476,33 +476,33 @@ export function ListEditor({
   return (
     <>
       {items.map((it) => (
-        <div key={it} className="flex min-h-[3.25rem] items-center gap-3 pr-4 pl-3">
+        <div key={it} className="flex min-h-[52px] items-center gap-3 pr-4 pl-3">
           <button
             type="button"
             aria-label={`Remove ${it}`}
             onClick={() => onChange(items.filter((x) => x !== it))}
             className="grid size-8 place-items-center active:scale-90"
           >
-            <CircleMinus className="size-[1.375rem] fill-destructive text-white" />
+            <CircleMinus className="size-[22px] fill-destructive text-white" />
           </button>
-          <span className={cn("flex-1 text-[1.0625rem]", tone === "alert" && "font-semibold text-alert")}>{it}</span>
+          <span className={cn("flex-1 text-[17px]", tone === "alert" && "font-semibold text-alert")}>{it}</span>
         </div>
       ))}
       <form
-        className="flex min-h-[3.25rem] items-center gap-3 pl-3"
+        className="flex min-h-[52px] items-center gap-3 pl-3"
         onSubmit={(e) => {
           e.preventDefault()
           add()
         }}
       >
-        <CirclePlus className="m-[0.3125rem] size-[1.375rem] shrink-0 fill-success text-white" />
+        <CirclePlus className="m-[5px] size-[22px] shrink-0 fill-success text-white" />
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onBlur={add}
           placeholder={placeholder}
           enterKeyHint="done"
-          className="min-w-0 flex-1 bg-transparent py-3 pr-4 text-[1.0625rem] outline-none placeholder:text-muted-foreground/60"
+          className="min-w-0 flex-1 bg-transparent py-3 pr-4 text-[17px] outline-none placeholder:text-muted-foreground/60"
         />
       </form>
     </>
@@ -534,7 +534,7 @@ export function CheckRow({
       />
       <span className="min-w-0 flex-1 py-2.5">
         <span className={cn("block transition-colors", checked && "text-muted-foreground line-through decoration-muted-foreground/50")}>{label}</span>
-        {detail && <span className="block text-[0.8125rem] text-muted-foreground">{detail}</span>}
+        {detail && <span className="block text-[13px] text-muted-foreground">{detail}</span>}
       </span>
       {trailing}
     </label>
@@ -572,7 +572,7 @@ export function Segmented<T extends string | number>({
   className?: string
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className={cn("flex h-9 rounded-full bg-muted p-[0.1875rem]", className)}>
+    <div role="radiogroup" aria-label={label} className={cn("flex h-9 rounded-full bg-muted p-[3px]", className)}>
       {options.map((o) => (
         <button
           key={String(o.value)}
@@ -584,7 +584,7 @@ export function Segmented<T extends string | number>({
             onChange(o.value)
           }}
           className={cn(
-            "flex-1 rounded-full px-2 text-[0.8125rem] font-semibold transition-[background-color,box-shadow] duration-200",
+            "flex-1 rounded-full px-2 text-[13px] font-semibold transition-[background-color,box-shadow] duration-200",
             o.value === value && "bg-card shadow-[0_2px_6px_rgb(0_0_0/0.12)] dark:bg-[#636366]",
           )}
         >

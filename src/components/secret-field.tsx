@@ -45,7 +45,7 @@ export function SecretRow({
 
   return (
     <>
-      <div className="flex min-h-[3.25rem] items-center gap-2 pr-2 pl-4 text-[1.0625rem]">
+      <div className="flex min-h-[52px] items-center gap-2 pr-2 pl-4 text-[17px]">
         <button
           type="button"
           className="flex min-w-0 flex-1 items-center gap-2 py-3 text-left active:opacity-60"
@@ -55,7 +55,7 @@ export function SecretRow({
           }}
         >
           <span className="flex-1 truncate">{label}</span>
-          <span className="truncate font-mono text-[0.9375rem] text-muted-foreground tabular-nums">
+          <span className="truncate font-mono text-[15px] text-muted-foreground tabular-nums">
             {plain ? (revealed ? plain : mask(plain)) : "Not Set"}
           </span>
         </button>
@@ -88,7 +88,7 @@ export function SecretRow({
               autoCorrect="off"
               spellCheck={false}
               enterKeyHint="done"
-              className="min-w-0 flex-1 bg-transparent py-3 text-right font-mono text-[1.0625rem] outline-none"
+              className="min-w-0 flex-1 bg-transparent py-3 text-right font-mono text-[17px] outline-none"
             />
           </FieldRow>
         </Group>

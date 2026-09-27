@@ -2,9 +2,11 @@ import { useLayoutEffect, useRef, useState } from "react"
 import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import { ActionRow, Group, SheetBar } from "@/components/ios"
 import { nowHHMM } from "@/lib/date"
-import { cn, remPx } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
+const ITEM = 40
 const VISIBLE = 5
+const PAD = ((VISIBLE - 1) / 2) * ITEM
 
 const HOURS = Array.from({ length: 12 }, (_, i) => String(i === 0 ? 12 : i))
 const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"))
@@ -25,13 +27,12 @@ function Wheel({
   className?: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
-  const [item] = useState(() => remPx(2.5))
 
   // Position once on mount (the sheet remounts its content on every open);
   // after that the scroll position is the source of truth.
   const initial = useRef(index)
   useLayoutEffect(() => {
-    if (ref.current) ref.current.scrollTop = initial.current * item
+    if (ref.current) ref.current.scrollTop = initial.current * ITEM
   }, [])
 
   return (
@@ -42,7 +43,7 @@ function Wheel({
       // Vertical drags scroll the wheel, never dismiss the sheet.
       data-base-ui-swipe-ignore=""
       onScroll={(e) => {
-        const i = Math.min(items.length - 1, Math.max(0, Math.round(e.currentTarget.scrollTop / item)))
+        const i = Math.min(items.length - 1, Math.max(0, Math.round(e.currentTarget.scrollTop / ITEM)))
         if (i !== index) {
           navigator.vibrate?.(4)
           onChange(i)
@@ -52,7 +53,7 @@ function Wheel({
         "relative z-10 snap-y snap-mandatory overflow-y-auto overscroll-contain scrollbar-none [touch-action:pan-y] mask-[linear-gradient(transparent,black_30%,black_70%,transparent)]",
         className,
       )}
-      style={{ height: VISIBLE * item, paddingBlock: ((VISIBLE - 1) / 2) * item }}
+      style={{ height: VISIBLE * ITEM, paddingBlock: PAD }}
     >
       {items.map((it, i) => (
         <button
@@ -60,12 +61,12 @@ function Wheel({
           type="button"
           role="option"
           aria-selected={i === index}
-          onClick={() => ref.current?.scrollTo({ top: i * item, behavior: "smooth" })}
+          onClick={() => ref.current?.scrollTo({ top: i * ITEM, behavior: "smooth" })}
           className={cn(
-            "block w-full snap-center text-[1.375rem] tabular-nums transition-colors",
+            "block w-full snap-center text-[22px] tabular-nums transition-colors",
             i === index ? "text-foreground" : "text-muted-foreground",
           )}
-          style={{ height: item }}
+          style={{ height: ITEM }}
         >
           {it}
         </button>
@@ -118,7 +119,7 @@ export function TimePickerDrawer({
         />
         <div className="grid gap-5 px-4 pb-5">
           <div className="relative mx-auto flex w-full max-w-xs justify-center gap-1">
-              <div className="pointer-events-none absolute inset-x-0 top-20 h-10 rounded-xl bg-muted" />
+              <div className="pointer-events-none absolute inset-x-0 rounded-xl bg-muted" style={{ top: PAD, height: ITEM }} />
             <Wheel label="Hour" items={HOURS} index={h % 12} onChange={(i) => setH((prev) => i + (prev >= 12 ? 12 : 0))} className="w-16" />
             <Wheel label="Minute" items={MINUTES} index={m} onChange={setM} className="w-16" />
             <Wheel label="AM or PM" items={PERIODS} index={h >= 12 ? 1 : 0} onChange={(i) => setH((prev) => (prev % 12) + i * 12)} className="w-16" />

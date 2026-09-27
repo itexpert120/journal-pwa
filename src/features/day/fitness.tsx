@@ -57,8 +57,8 @@ function Water({ entry, patch }: SectionProps) {
       <Cell className="grid gap-3">
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-[1.75rem] leading-none font-bold tabular-nums">{waterLabel(entry.water, unit)}</p>
-            <p className="mt-1 text-[0.9375rem] text-muted-foreground">of {waterLabel(goal, unit)} goal</p>
+            <p className="text-[28px] leading-none font-bold tabular-nums">{waterLabel(entry.water, unit)}</p>
+            <p className="mt-1 text-[15px] text-muted-foreground">of {waterLabel(goal, unit)} goal</p>
           </div>
           <Stepper label="water" onDecrement={() => set(entry.water - 1)} onIncrement={() => set(entry.water + 1)} />
         </div>
@@ -232,12 +232,12 @@ function Nutrition({ date, entry, patch }: SectionProps) {
     <Group header="Nutrition">
       <Cell className="grid gap-3">
         <div>
-          <p className="text-[1.75rem] leading-none font-bold tabular-nums">
+          <p className="text-[28px] leading-none font-bold tabular-nums">
             {t.kcal}
-            <span className="ml-1 text-[0.9375rem] font-normal text-muted-foreground">kcal eaten</span>
+            <span className="ml-1 text-[15px] font-normal text-muted-foreground">kcal eaten</span>
           </p>
           {burned > 0 && (
-            <p className="mt-1 text-[0.9375rem] text-muted-foreground tabular-nums">
+            <p className="mt-1 text-[15px] text-muted-foreground tabular-nums">
               {burned} burned · net {t.kcal - burned}
             </p>
           )}
@@ -249,7 +249,7 @@ function Nutrition({ date, entry, patch }: SectionProps) {
                 <div key={m.k} className={cn("h-full", m.color)} style={{ flexGrow: m.v }} />
               ))}
             </div>
-            <div className="flex gap-4 text-[0.8125rem] text-muted-foreground">
+            <div className="flex gap-4 text-[13px] text-muted-foreground">
               {macros.map((m) => (
                 <span key={m.k} className="flex items-center gap-1.5 tabular-nums">
                   <span className={cn("size-2 rounded-full", m.color)} />

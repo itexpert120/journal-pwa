@@ -89,7 +89,7 @@ function DayPage({ date }: { date: ISODate }) {
       {/* Transparent nav layer: glass controls over a scroll-edge blur. */}
       <header className="no-print sticky top-0 z-20 pt-safe">
         <div aria-hidden className={cn("edge-top transition-opacity duration-200", scrolled ? "opacity-100" : "opacity-0")} />
-        <div className="mx-auto flex h-[3.375rem] w-full max-w-5xl items-center gap-2 px-4 md:px-6">
+        <div className="mx-auto flex h-[54px] w-full max-w-5xl items-center gap-2 px-4 md:px-6">
           <BarButton label="Previous day" onClick={() => flipTo(shiftISO(date, -1), date)}>
             <ChevronLeft strokeWidth={2.4} />
           </BarButton>
@@ -99,14 +99,14 @@ function DayPage({ date }: { date: ISODate }) {
             onClick={() => setPicker(true)}
             aria-label={`Change date, currently ${format(d, "EEEE d MMMM yyyy")}`}
           >
-            <span className="text-[1.0625rem] leading-tight font-semibold">{format(d, "EEEE")}</span>
-            <span className="text-[0.8125rem] text-muted-foreground tabular-nums">
+            <span className="text-[17px] leading-tight font-semibold">{format(d, "EEEE")}</span>
+            <span className="text-[13px] text-muted-foreground tabular-nums">
               {format(d, "d MMMM yyyy")}
               {isToday && <span className="font-semibold text-primary"> · Today</span>}
             </span>
           </button>
           {!isToday && (
-            <BarButton label="Go to today" onClick={() => flipTo(todayISO(), date)} className="px-3.5 text-[0.9375rem] font-semibold text-primary">
+            <BarButton label="Go to today" onClick={() => flipTo(todayISO(), date)} className="px-3.5 text-[15px] font-semibold text-primary">
               Today
             </BarButton>
           )}
@@ -123,14 +123,14 @@ function DayPage({ date }: { date: ISODate }) {
               to="/profile"
               viewTransition
               onClick={() => setNav("tab")}
-              className="shrink-0 rounded-full bg-foreground px-3 py-1.5 text-[0.8125rem] font-semibold text-background active:opacity-80"
+              className="shrink-0 rounded-full bg-foreground px-3 py-1.5 text-[13px] font-semibold text-background active:opacity-80"
             >
               Profile
             </Link>
             <button
               type="button"
               onClick={() => setPicker(true)}
-              className="shrink-0 rounded-full px-3 py-1.5 text-[0.8125rem] font-bold tabular-nums active:bg-muted"
+              className="shrink-0 rounded-full px-3 py-1.5 text-[13px] font-bold tabular-nums active:bg-muted"
             >
               {d.getFullYear()}
             </button>
@@ -143,7 +143,7 @@ function DayPage({ date }: { date: ISODate }) {
                   aria-current={active}
                   onClick={() => goMonth(i)}
                   className={cn(
-                    "min-w-11 shrink-0 rounded-full px-2.5 py-1.5 text-[0.8125rem] font-medium transition-colors md:flex-1",
+                    "min-w-11 shrink-0 rounded-full px-2.5 py-1.5 text-[13px] font-medium transition-colors md:flex-1",
                     active ? "bg-primary font-semibold text-primary-foreground" : "active:bg-muted",
                   )}
                 >
@@ -188,7 +188,7 @@ function DayPage({ date }: { date: ISODate }) {
               to={`/export?from=${date}&to=${date}`}
               viewTransition
               onClick={() => setNav("push")}
-              className="flex h-11 items-center gap-2 justify-self-center rounded-full px-4 text-[0.9375rem] font-medium text-primary active:bg-muted"
+              className="flex h-11 items-center gap-2 justify-self-center rounded-full px-4 text-[15px] font-medium text-primary active:bg-muted"
             >
               <Share className="size-4" /> Export This Day
             </Link>

@@ -90,7 +90,7 @@ export function Component() {
             >
               <span
                 className={cn(
-                  "rounded-full px-2.5 py-1 text-[0.8125rem] font-semibold tabular-nums",
+                  "rounded-full px-2.5 py-1 text-[13px] font-semibold tabular-nums",
                   o.in === 0 ? "bg-primary text-primary-foreground" : "text-muted-foreground",
                 )}
               >

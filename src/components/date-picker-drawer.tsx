@@ -55,12 +55,12 @@ export function DatePickerDrawer({
         />
         <div className="grid gap-3 overflow-y-auto px-4 pb-5">
           <div className="flex items-center gap-1 px-1">
-            <span className="text-[1.25rem] font-semibold">{format(month, "MMMM")}</span>
+            <span className="text-[20px] font-semibold">{format(month, "MMMM")}</span>
             <input
               aria-label="Year"
               inputMode="numeric"
               enterKeyHint="go"
-              className="w-[4.5ch] rounded-lg bg-transparent px-1 text-[1.25rem] font-semibold text-primary tabular-nums outline-none focus:bg-muted"
+              className="w-[4.5ch] rounded-lg bg-transparent px-1 text-[20px] font-semibold text-primary tabular-nums outline-none focus:bg-muted"
               value={yearText}
               onChange={(e) => {
                 const t = e.target.value.replace(/\D/g, "").slice(0, 4)
@@ -84,7 +84,7 @@ export function DatePickerDrawer({
                 type="button"
                 onClick={() => go(setMonth(month, i))}
                 className={cn(
-                  "h-9 min-w-13 shrink-0 rounded-full px-3 text-[0.9375rem] font-medium transition-colors",
+                  "h-9 min-w-13 shrink-0 rounded-full px-3 text-[15px] font-medium transition-colors",
                   i === month.getMonth() ? "bg-primary text-primary-foreground" : "bg-muted",
                 )}
               >

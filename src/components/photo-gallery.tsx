@@ -13,7 +13,7 @@ function Tile({ photo, onOpen }: { photo: Photo; onOpen: () => void }) {
     <button type="button" onClick={onOpen} className="relative aspect-square overflow-hidden rounded-xl bg-muted active:opacity-80">
       {url && <img src={url} alt={photo.caption || "Photo"} loading="lazy" decoding="async" className="size-full object-cover" />}
       {(photo.caption || photo.tags.length > 0) && (
-        <span className="absolute inset-x-0 bottom-0 truncate bg-linear-to-t from-black/70 to-transparent px-1.5 pt-4 pb-1 text-left text-[0.625rem] text-white">
+        <span className="absolute inset-x-0 bottom-0 truncate bg-linear-to-t from-black/70 to-transparent px-1.5 pt-4 pb-1 text-left text-[10px] text-white">
           {photo.caption || photo.tags.map((t) => `#${t}`).join(" ")}
         </span>
       )}
@@ -45,7 +45,7 @@ export function PhotoGallery({
         <button
           type="button"
           onClick={() => input.current?.click()}
-          className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-muted text-[0.8125rem] font-medium text-primary active:opacity-70"
+          className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-muted text-[13px] font-medium text-primary active:opacity-70"
         >
           <ImagePlus className="size-6" />
           Add photos

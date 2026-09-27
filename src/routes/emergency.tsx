@@ -13,10 +13,10 @@ const tel = (n: string) => `tel:${n.replace(/[^\d+]/g, "")}`
 function CallRow({ label, detail, number }: { label: string; detail?: string; number?: string }) {
   if (!number) return null
   return (
-    <a href={tel(number)} className="flex min-h-[3.75rem] items-center gap-3 px-4 active:bg-muted">
+    <a href={tel(number)} className="flex min-h-[60px] items-center gap-3 px-4 active:bg-muted">
       <span className="min-w-0 flex-1 py-2">
-        <span className="block text-[1.0625rem]">{label}</span>
-        <span className="block text-[0.9375rem] text-muted-foreground tabular-nums">{detail ? `${detail} · ${number}` : number}</span>
+        <span className="block text-[17px]">{label}</span>
+        <span className="block text-[15px] text-muted-foreground tabular-nums">{detail ? `${detail} · ${number}` : number}</span>
       </span>
       <span className="grid size-10 place-items-center rounded-full bg-success text-white">
         <Phone className="size-5 fill-current" />
@@ -51,7 +51,7 @@ export function Component() {
     <main className="h-dvh overflow-y-auto overscroll-contain bg-background">
       <header className="sticky top-0 z-20 pt-safe">
         <div aria-hidden className="edge-top" />
-        <div className="mx-auto flex h-[3.375rem] max-w-2xl items-center px-4">
+        <div className="mx-auto flex h-[54px] max-w-2xl items-center px-4">
           <button
             type="button"
             aria-label="Back"
@@ -62,17 +62,17 @@ export function Component() {
             }}
             className="glass grid size-11 place-items-center rounded-full active:scale-90"
           >
-            <ChevronLeft className="size-[1.375rem]" strokeWidth={2.4} />
+            <ChevronLeft className="size-[22px]" strokeWidth={2.4} />
           </button>
         </div>
       </header>
 
       <div className="mx-auto grid max-w-2xl gap-6 px-4 pb-[calc(env(safe-area-inset-bottom)+2rem)]">
         <div className="flex items-center gap-2 px-1">
-          <span className="grid size-8 place-items-center rounded-[0.5625rem] bg-alert text-white">
+          <span className="grid size-8 place-items-center rounded-[9px] bg-alert text-white">
             <Asterisk className="size-6" strokeWidth={3} />
           </span>
-          <h1 className="text-[2.125rem] leading-tight font-bold text-alert">Medical ID</h1>
+          <h1 className="text-[34px] leading-tight font-bold text-alert">Medical ID</h1>
         </div>
 
         <div className="flex items-center gap-4 px-1">
@@ -81,7 +81,7 @@ export function Component() {
           </span>
           <div className="min-w-0">
             <p className="text-2xl leading-tight font-bold">{p.legalName || "Name not set"}</p>
-            <p className="text-[0.9375rem] text-muted-foreground">
+            <p className="text-[15px] text-muted-foreground">
               {[age !== undefined && `${age} years old`, p.dob].filter(Boolean).join(" · ")}
             </p>
           </div>
@@ -94,8 +94,8 @@ export function Component() {
             ["Weight", p.baselineWeight ? `${kgTo(p.baselineWeight, s.units.weight)} ${s.units.weight}` : undefined],
           ].map(([k, v]) => (
             <div key={k} className="rounded-[1.25rem] bg-card p-3.5">
-              <p className="text-[0.8125rem] text-muted-foreground">{k}</p>
-              <p className={cn("mt-0.5 text-[1.375rem] font-bold", k === "Blood Type" && v && "text-alert")}>{v ?? "—"}</p>
+              <p className="text-[13px] text-muted-foreground">{k}</p>
+              <p className={cn("mt-0.5 text-[22px] font-bold", k === "Blood Type" && v && "text-alert")}>{v ?? "—"}</p>
             </div>
           ))}
         </div>

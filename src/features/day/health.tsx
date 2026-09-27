@@ -60,15 +60,15 @@ function BloodPressure({ entry, patch }: SectionProps) {
             key={b.id}
             label={
               <span className="tabular-nums">
-                <span className="text-[1.375rem] font-semibold">{b.sys && b.dia ? `${b.sys}/${b.dia}` : "—"}</span>
-                <span className="ml-1 text-[0.9375rem] text-muted-foreground">mmHg</span>
+                <span className="text-[22px] font-semibold">{b.sys && b.dia ? `${b.sys}/${b.dia}` : "—"}</span>
+                <span className="ml-1 text-[15px] text-muted-foreground">mmHg</span>
               </span>
             }
             detail={[formatTime12(b.time), b.pulse && `${b.pulse} bpm`].filter(Boolean).join(" · ")}
             onClick={() => ed.open(b.id)}
             chevron
           >
-            {c && <span className={cn("text-[0.9375rem] font-semibold", c.cls)}>{c.label}</span>}
+            {c && <span className={cn("text-[15px] font-semibold", c.cls)}>{c.label}</span>}
           </Row>
         )
       })}
@@ -149,7 +149,7 @@ function Medicines({ entry, patch }: SectionProps) {
             }
             label={med.name}
             detail={[med.dose, t ? formatTime12(t) : "Any time"].filter(Boolean).join(" · ")}
-            trailing={at && <span className="text-[0.9375rem] text-muted-foreground tabular-nums">{formatTime12(at)}</span>}
+            trailing={at && <span className="text-[15px] text-muted-foreground tabular-nums">{formatTime12(at)}</span>}
           />
         )
       })}
@@ -166,7 +166,7 @@ function Medicines({ entry, patch }: SectionProps) {
           label={x.name || "Medicine"}
           detail={[x.dose, formatTime12(x.time)].filter(Boolean).join(" · ")}
           trailing={
-            <button type="button" onClick={(ev) => (ev.preventDefault(), ed.open(x.id))} className="text-[0.9375rem] text-primary">
+            <button type="button" onClick={(ev) => (ev.preventDefault(), ed.open(x.id))} className="text-[15px] text-primary">
               Edit
             </button>
           }

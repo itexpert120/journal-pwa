@@ -38,7 +38,7 @@ function JournalText({ value, onCommit, readOnly, placeholder }: { value: string
       readOnly={readOnly}
       placeholder={placeholder}
       aria-label="Journal text"
-      className="block field-sizing-content min-h-[55dvh] w-full resize-none bg-transparent px-5 py-0 font-serif text-[1.1875rem] leading-8 caret-primary outline-none placeholder:text-muted-foreground/60"
+      className="block field-sizing-content min-h-[55dvh] w-full resize-none bg-transparent px-5 py-0 font-serif text-[19px] leading-8 caret-primary outline-none placeholder:text-muted-foreground/60"
     />
   )
 }
@@ -101,7 +101,7 @@ export function JournalSection({ date, entry, patch }: SectionProps) {
           data-no-swipe={mode === "write" ? "" : undefined}
         >
           <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3">
-            <h3 className="text-[0.9375rem] font-semibold text-muted-foreground">Dear diary</h3>
+            <h3 className="text-[15px] font-semibold text-muted-foreground">Dear diary</h3>
             <Segmented<Paper>
               label="Paper"
               value={paper}

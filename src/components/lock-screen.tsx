@@ -52,13 +52,13 @@ export function LockScreen() {
     }
   }
 
-  const key = "grid size-[4.875rem] place-items-center rounded-full bg-foreground/[0.08] transition-[background-color,transform] duration-100 active:scale-95 active:bg-foreground/25 dark:bg-white/[0.14]"
+  const key = "grid size-[78px] place-items-center rounded-full bg-foreground/[0.08] transition-[background-color,transform] duration-100 active:scale-95 active:bg-foreground/25 dark:bg-white/[0.14]"
 
   return (
     <div className="fixed inset-0 z-100 flex flex-col items-center bg-background px-8 pt-safe pb-safe">
       <div className="flex flex-1 flex-col items-center justify-center gap-4 pt-10">
         <Lock className="size-6" />
-        <p className="text-[1.25rem] font-medium">{error ? "Wrong Passcode" : "Enter Passcode"}</p>
+        <p className="text-[20px] font-medium">{error ? "Wrong Passcode" : "Enter Passcode"}</p>
         <div className={cn("flex h-4 gap-5", error && "animate-[shake_0.35s]")} aria-live="polite" aria-label={`${pin.length} digits entered`}>
           {Array.from({ length: Math.max(4, pin.length) }).map((_, i) => (
             <span key={i} className={cn("size-3.5 rounded-full border-[1.5px] border-foreground transition-colors", i < pin.length && "bg-foreground")} />
@@ -70,8 +70,8 @@ export function LockScreen() {
         {KEYS.map(([n, letters]) => (
           <button key={n} type="button" aria-label={n} onClick={() => press(n)} className={key}>
             <span className="grid justify-items-center leading-none">
-              <span className="text-[2.125rem] font-light">{n}</span>
-              <span className="h-3 text-[0.625rem] font-semibold tracking-[0.15em]">{letters}</span>
+              <span className="text-[34px] font-light">{n}</span>
+              <span className="h-3 text-[10px] font-semibold tracking-[0.15em]">{letters}</span>
             </span>
           </button>
         ))}
@@ -80,18 +80,18 @@ export function LockScreen() {
           aria-label="Unlock with Face ID"
           disabled={!cfg?.credentialId}
           onClick={() => bio()}
-          className="grid size-[4.875rem] place-items-center rounded-full text-primary active:scale-95 disabled:invisible"
+          className="grid size-[78px] place-items-center rounded-full text-primary active:scale-95 disabled:invisible"
         >
           <ScanFace className="size-8" strokeWidth={1.6} />
         </button>
         <button type="button" aria-label="0" onClick={() => press("0")} className={key}>
-          <span className="text-[2.125rem] font-light">0</span>
+          <span className="text-[34px] font-light">0</span>
         </button>
         <button
           type="button"
           aria-label="Delete"
           onClick={() => setPin((p) => p.slice(0, -1))}
-          className={cn("grid size-[4.875rem] place-items-center rounded-full active:scale-95", !pin && "invisible")}
+          className={cn("grid size-[78px] place-items-center rounded-full active:scale-95", !pin && "invisible")}
         >
           <Delete className="size-7" strokeWidth={1.6} />
         </button>
@@ -102,7 +102,7 @@ export function LockScreen() {
           to="/emergency"
           viewTransition
           onClick={() => setNav("modal")}
-          className="flex h-11 items-center gap-1.5 rounded-full px-4 text-[1.0625rem] font-medium text-alert active:bg-muted"
+          className="flex h-11 items-center gap-1.5 rounded-full px-4 text-[17px] font-medium text-alert active:bg-muted"
         >
           <Asterisk className="size-5" strokeWidth={3} /> Emergency
         </Link>

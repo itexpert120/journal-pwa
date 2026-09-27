@@ -20,7 +20,7 @@ export function Root() {
   return (
     <>
       {locked && pathname !== "/emergency" ? <LockScreen /> : <Outlet />}
-      <Toaster position="top-center" offset={{ top: "calc(env(safe-area-inset-top) + 0.75rem)" }} />
+      <Toaster position="top-center" offset={{ top: "calc(env(safe-area-inset-top) + 12px)" }} />
     </>
   )
 }

@@ -50,13 +50,13 @@ function Mood({ entry, patch }: SectionProps) {
             >
               <span
                 className={cn(
-                  "grid size-12 place-items-center rounded-full text-[1.75rem] transition-all duration-200",
+                  "grid size-12 place-items-center rounded-full text-[28px] transition-all duration-200",
                   on ? "scale-110 bg-primary/15 ring-2 ring-primary" : "bg-muted/60",
                 )}
               >
                 {m.emoji}
               </span>
-              <span className={cn("text-[0.6875rem] font-medium", on ? "text-primary" : "text-muted-foreground")}>{m.label}</span>
+              <span className={cn("text-[11px] font-medium", on ? "text-primary" : "text-muted-foreground")}>{m.label}</span>
             </button>
           )
         })}
@@ -70,10 +70,10 @@ function Energy({ entry, patch }: SectionProps) {
   const lvl = entry.energy ?? 0
   const tint = lvl <= 20 ? "bg-[#ff3b30]" : lvl <= 40 ? "bg-[#ff9500]" : "bg-[#34c759]"
   return (
-    <div className="flex min-h-[3.25rem] items-center gap-3 px-4">
-      <span className="text-[1.0625rem]">Energy</span>
+    <div className="flex min-h-[52px] items-center gap-3 px-4">
+      <span className="text-[17px]">Energy</span>
       <div className="flex flex-1 items-center justify-end">
-        <div role="radiogroup" aria-label="Energy" className="flex h-8 items-center rounded-[0.625rem] border-2 border-muted-foreground/40 p-[0.1875rem]">
+        <div role="radiogroup" aria-label="Energy" className="flex h-8 items-center rounded-[10px] border-2 border-muted-foreground/40 p-[3px]">
           {ENERGY_LEVELS.map((l) => (
             <button
               key={l}
@@ -87,12 +87,12 @@ function Energy({ entry, patch }: SectionProps) {
               }}
               className="h-full w-7 px-[1.5px] first:pl-0 last:pr-0"
             >
-              <span className={cn("block h-full rounded-[0.25rem] transition-colors duration-200", lvl >= l ? tint : "bg-muted")} />
+              <span className={cn("block h-full rounded-[4px] transition-colors duration-200", lvl >= l ? tint : "bg-muted")} />
             </button>
           ))}
         </div>
-        <span className="ml-px h-3 w-[0.1875rem] rounded-r-sm bg-muted-foreground/40" aria-hidden />
-        <span className="ml-2 w-11 text-right text-[0.9375rem] text-muted-foreground tabular-nums">{entry.energy ? `${entry.energy}%` : "—"}</span>
+        <span className="ml-px h-3 w-[3px] rounded-r-sm bg-muted-foreground/40" aria-hidden />
+        <span className="ml-2 w-11 text-right text-[15px] text-muted-foreground tabular-nums">{entry.energy ? `${entry.energy}%` : "—"}</span>
       </div>
     </div>
   )
@@ -181,7 +181,7 @@ function Weather({ date, entry, patch }: SectionProps) {
 export function HeaderBlock(props: SectionProps) {
   return (
     <div className="grid gap-5">
-      <p className="px-6 text-center font-serif text-[1.0625rem] leading-snug text-muted-foreground italic">“{quoteFor(props.date)}”</p>
+      <p className="px-6 text-center font-serif text-[17px] leading-snug text-muted-foreground italic">“{quoteFor(props.date)}”</p>
       <div className="empty:hidden">
         <Occasions date={props.date} />
       </div>
